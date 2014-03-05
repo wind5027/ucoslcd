@@ -53,9 +53,9 @@ void TaskStart(void * pdata)
     MEMPointer = OSMemCreate(MEMPartition,PARTITION_NUM,PARTITION_LENGTH,&err);	    //创建内存分区
     
     OS_ENTER_CRITICAL();   
-//    OSTaskCreate(TaskLed0, (void * )0, (OS_STK *)&TASK_LED0_STK[LED_STK_SIZE-1], LED0_TASK_Prio);
-//    OSTaskCreate(TaskLed1, (void * )0, (OS_STK *)&TASK_LED1_STK[LED_STK_SIZE-1], LED1_TASK_Prio);
-//    OSTaskCreate(TaskLed2, (void * )0, (OS_STK *)&TASK_LED2_STK[LED_STK_SIZE-1], LED2_TASK_Prio);
+    OSTaskCreate(TaskLed0, (void * )0, (OS_STK *)&TASK_LED0_STK[LED_STK_SIZE-1], LED0_TASK_Prio);
+    OSTaskCreate(TaskLed1, (void * )0, (OS_STK *)&TASK_LED1_STK[LED_STK_SIZE-1], LED1_TASK_Prio);
+    OSTaskCreate(TaskLed2, (void * )0, (OS_STK *)&TASK_LED2_STK[LED_STK_SIZE-1], LED2_TASK_Prio);
     
     OSTaskCreate(TaskRTCUpdate, (void * )0,                           //创建RTC更新任务 
                  (OS_STK *)&TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE-1], 

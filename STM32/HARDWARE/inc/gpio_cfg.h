@@ -21,6 +21,7 @@
 **************************************************/
 #define  EN_GPIO_KEY        ((Uint16)0x0001)
 #define  EN_GPIO_SPI1       ((Uint16)0x0002)
+#define  EN_GPIO_SPI2       ((Uint16)0x0004)
 #define  EN_GPIO_USART1     ((Uint16)0x0010)
 #define  EN_GPIO_USB        ((Uint16)0x0020)
 #define  EN_GPIO_I2C2       ((Uint16)0x0100)
@@ -93,11 +94,11 @@
 说明：LCD端口相关
 **************************************************/
 #define RCC_LCD_PORT   RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOF
-#define LCD_RST_PIN    GPIO_Pin_5
+#define LCD_RST_PIN    GPIO_Pin_10
 #define LCD_PWM_PIN    GPIO_Pin_11
 #define GPIOC_LCD_PIN  LCD_RST_PIN
 #define GPIOF_LCD_PIN  LCD_PWM_PIN
-#define LCD_RST_PORT   GPIOC
+#define LCD_RST_PORT   GPIOA
 #define LCD_PWM_PORT   GPIOF
 #define LcdRst()                                  \
 do{                                               \
@@ -130,7 +131,15 @@ do{                                               \
 #define SPI1_MOSI_PIN   GPIO_Pin_7
 #define SPI1_PIN        SPI1_SCK_PIN | SPI1_MISO_PIN | SPI1_MOSI_PIN
 
-
+/**************************************************
+说明：SPI2端口相关
+**************************************************/
+#define RCC_SPI2_PORT   RCC_APB2Periph_GPIOB 
+#define SPI2_PORT       GPIOB
+#define SPI2_SCK_PIN    GPIO_Pin_13
+#define SPI2_MISO_PIN   GPIO_Pin_14
+#define SPI2_MOSI_PIN   GPIO_Pin_15
+#define SPI2_PIN        SPI2_SCK_PIN | SPI2_MISO_PIN | SPI2_MOSI_PIN
 
 /*
 *************************************************************************************

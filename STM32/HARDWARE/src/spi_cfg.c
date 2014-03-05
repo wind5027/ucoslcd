@@ -41,6 +41,35 @@ void SPI1_Config(void)
 	SPI_Cmd(SPI1,ENABLE);                                               //SPI使能
 }
 
+/*
+*************************************************************************************
+* 名    称：void SPI1_Config(void)
+* 功    能：SPI配置
+* 入口参数：无
+* 出口参数：无
+*************************************************************************************
+*/
+void SPI2_Config(void)
+{
+    SPI_InitTypeDef  SPI_InitStructure;
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | RCC_APB1Periph_SPI2, ENABLE);  //开启SPI2模块时钟，辅助功能时钟
+    
+    GPIO_Config(EN_GPIO_SPI2,0);                                                //配置SPI2端口
+    
+	SPI_I2S_DeInit(SPI2);	
+	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;  //SPI全双工模式	
+	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;                       //主机模式	
+	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;                   //SPI通信数据位--8位	
+	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							//SCLK空闲时  置低电平	
+	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;						//第一个时钟沿捕获数据	
+	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;                           //软件管理NSS信号	
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64; //SPI波特率   分频值  72M/2=36M	
+	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;                  //SPI通信 高位在前	
+	SPI_InitStructure.SPI_CRCPolynomial = 7;                            //CRC冗余校验多项式	
+	SPI_Init(SPI2,&SPI_InitStructure);                                  //初始化SPI2
+	SPI_Cmd(SPI2,ENABLE);                                               //SPI使能
+}
+
 
 /*
 *************************************************************************************

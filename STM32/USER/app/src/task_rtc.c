@@ -40,10 +40,10 @@ void TaskRTCUpdate(void *pdata)
 //    Uint32 tmp;   
 //    tmp = 0;  
 //    PD1->Buf[0] = 0;
-    for(PD1->Buf[0] = 0; PD1->Buf[0] < 100;PD1->Buf[0] ++){
-        PD1->Buf[PD1->Buf[0]] = PD1->Buf[0];
-        TmpBuf[PD1->Buf[0]] = 0;
-    }
+//    for(PD1->Buf[0] = 0; PD1->Buf[0] < 100;PD1->Buf[0] ++){
+//        PD1->Buf[PD1->Buf[0]] = PD1->Buf[0];
+//        TmpBuf[PD1->Buf[0]] = 0;
+//    }
     
     CDat.YMaxDat  = 100;
     CDat.XMaxDat  = 4096;
@@ -93,8 +93,7 @@ void TaskRTCUpdate(void *pdata)
             CordDat->CDatP->YPixel   = 410;
             CordDat->CDatP->XPixel   = 693;
             
-            CDat.XMaxDat = PD1->Buf[0];
-            PD1->Buf[0] ++;
+            CDat.XMaxDat = 200;
             
             //CordDat->YMaxDat  = 400;
             //CordDat->XMaxDat  = 683;
@@ -129,7 +128,6 @@ void TaskRTCUpdate(void *pdata)
             
                 
             MEM_Set((Uint8 *)TmpBuf,0,200);
-            MEM_Cpy((Uint8 *)TmpBuf,(Uint8* )PD1->Buf,200);
             
             OSMutexPost(FSMCMutex);            //释放FSMC互斥信号量
             

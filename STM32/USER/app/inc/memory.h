@@ -27,8 +27,8 @@
 #define BUF_ADDR2           (PDat2 *)(SRAM_BASE_ADDR + 1024)
 
 
-extern PDat1 * PD1;
-extern PDat2 * PD2;
+//extern PDat1 * PD1;
+//extern PDat2 * PD2;
 
 
 /************************************************

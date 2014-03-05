@@ -102,6 +102,15 @@ void GPIO_Config(Uint16 GPIOMask , Uint16 FMask)
         GPIO_InitStructure.GPIO_Pin   = SPI1_PIN;      
         GPIO_Init(LCD_RST_PORT,&GPIO_InitStructure); 
     }
+    if(ReadMask(GPIOMask,EN_GPIO_SPI2) == EN_GPIO_SPI2){
+        RCC_APB2PeriphClockCmd(RCC_SPI2_PORT , ENABLE);      //开启SPI2端口时钟
+        
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;    //SPI2为输出口
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+        GPIO_InitStructure.GPIO_Pin   = SPI2_PIN;      
+        GPIO_Init(LCD_RST_PORT,&GPIO_InitStructure); 
+    }
 }
 /*************************************************************************************
 * 说明：file end

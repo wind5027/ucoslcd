@@ -26,8 +26,8 @@ Uint8 MEMPartition[PARTITION_NUM][PARTITION_LENGTH];
 
 
 #endif
-PDat1 * PD1 = BUF_ADDR1;
-PDat2 * PD2 = BUF_ADDR2;
+//PDat1 * PD1 = BUF_ADDR1;
+//PDat2 * PD2 = BUF_ADDR2;
 
 
 
