@@ -113,6 +113,19 @@ void DMA1_Channel1_IRQHandler(void)
     OSIntExit();
 }
 #endif
+extern Uint8 flag;
+void DMA1_Channel4_IRQHandler(void)
+{
+    if(DMA_GetITStatus(DMA1_FLAG_TC4)){
+     flag = 1;   
+        
+        
+        
+//        DMA_Cmd(DMA1_Channel4,DISABLE);
+//        DMA_Cmd(DMA1_Channel5,DISABLE);
+    }
+	DMA_ClearITPendingBit(DMA1_FLAG_GL4 | DMA1_FLAG_TC4 | DMA1_FLAG_HT4 | DMA1_FLAG_TE4);
+}
  
 /*
 void PendSV_Handler(void)

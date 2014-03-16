@@ -12,6 +12,7 @@
 #include "user_cfg.h"
 #include "drivers.h"
 #include "memory.h"
+#include "lcd_tft.h"
 
 /*
 *************************************************************************************
@@ -55,14 +56,18 @@ void NVIC_Configuration(void)
 *************************************************************************************
 */
 void SysInit(void)
-{
+{   
     NVIC_Configuration();                     //中断配置
     SystemInit();                             //系统时钟配置
-    SysTickConfig();                          //ucos系统时钟配置
-    GPIO_Config(EN_GPIO_LED,0);               //
-    SPI1_Config();                            //SPI1初始化
+
+    SPI2_Config();                            //SPI2初始化
     LCD_Init();
     RTC_Prepare();
+    
+    LCD_SetBkgrdSpiOfDma(0);
+//    while(1);
+    
+    SysTickConfig();                          //ucos系统时钟配置
 
 }
 

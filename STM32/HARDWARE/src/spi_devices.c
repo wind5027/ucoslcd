@@ -121,6 +121,74 @@ Uint8 SPI_DISK_GetStatus(void)
     return Status;
 }
 
+/*
+********************************************************************************
+**函数名称：Uint8 SPI_Flash_SendByte(Uint8 Byte)
+**函数功能：SPI字节读取及写入
+**入口参数：无
+**返回参数：无
+********************************************************************************
+*/
+Uint16 SPI_FLASH_SendByte(Uint16 Byte)
+{
+    return SPI2_ReadWriteByte(Byte);
+}
+
+Uint16 SPI_FLASH_ReciveByte(void)
+{
+    return SPI2_ReadWriteByte(0x00);
+}
+void SPI_FLASH_WriteEnable(void)
+{
+    FlashEnable();                   // Clr CS
+    SPI_FLASH_SendByte(MEM_WREN);    // Set Write Enable Latch CMD
+    FlashDisable();                  // Set CS
+}
+
+/*
+********************************************************************************
+**函数名称：void SPI_FLASH_SendAddr(Uint32 Addr, Uint8 CMD)
+**函数功能：向SPI Flash 操作码及发送地址  8bit模式
+**入口参数：Uint32 Addr 发送的地址
+            Uint16 CMD  操作码
+**返回参数：无
+********************************************************************************
+*/
+void SPI_FLASH_SendAddr(Uint32 Addr, Uint8 CMD)
+{
+    SPI_FLASH_SendByte(CMD);                     // Read Memory Data CMD
+    SPI_FLASH_SendByte((Uint8)(Addr >> 16));     // Recive Address MSB
+    SPI_FLASH_SendByte((Uint8)(Addr >> 8));      // Recive Address MSB
+    SPI_FLASH_SendByte((Uint8)Addr);             // Recive Address LSB
+}
+
+/*
+********************************************************************************
+**函数名称：void SPI_FLASH_Read(Uint32 Addr, Uint8 * Buf, Uint32 Cont)
+**函数功能：向SPI存储器读取Cont个数据 8bit模式
+**入口参数：Uint32 Addr 读取的地址
+            Uint16 * Buf 将读取的数据缓冲区
+            Uint32 Cont  读取数据个数
+**返回参数：无
+********************************************************************************
+*/
+void SPI_FLASH_Read(Uint32 Addr, Uint8 * Buf, Uint32 Cont)
+{
+    FlashEnable();                                         // Clr CS
+    SPI_FLASH_SendAddr(Addr,MEM_READ);                     //Send CMD and Address
+    do{
+        *Buf = SPI_FLASH_ReciveByte();                     // Recive Data
+        Buf ++;
+        Cont --;
+    }while(Cont);
+    FlashDisable();                                        // Set CS
+}
+
+
+
+
+
+
 
 
 

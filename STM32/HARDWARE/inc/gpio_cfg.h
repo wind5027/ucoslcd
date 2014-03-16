@@ -115,12 +115,29 @@ do{                                               \
 /**************************************************
 说明：FM EPRAM端口相关
 **************************************************/
+#define RCC_FM_CS_PORT     RCC_APB2Periph_GPIOC
 #define FM_CS_PORT         GPIOC
-#define FM_CS_PIN          GPIO_Pin_4
-#define FMEnable()         GPIO_ResetBits(GPIOC,GPIO_Pin_4)
-#define FMDisable()        GPIO_SetBits(GPIOC,GPIO_Pin_4)
+#define FM_CS_PIN          GPIO_Pin_7
 
-
+#define FMDisable()        GPIO_SetBits(FM_CS_PORT,FM_CS_PIN)
+#define FMEnable()                          \
+do{                                         \
+    FlashDisable();                         \
+    GPIO_ResetBits(FM_CS_PORT,FM_CS_PIN);   \
+}while(0)                                   
+
+/**************************************************
+说明：SPI FLASH端口相关
+**************************************************/
+#define RCC_FLASH_CS_PORT     RCC_APB2Periph_GPIOC
+#define FLASH_CS_PORT         GPIOC
+#define FLASH_CS_PIN          GPIO_Pin_6
+#define FlashDisable()        GPIO_SetBits(FLASH_CS_PORT,FLASH_CS_PIN)
+#define FlashEnable()                           \
+do{                                             \
+    FMDisable();                                \
+    GPIO_ResetBits(FLASH_CS_PORT,FLASH_CS_PIN); \
+}while(0)                                       
 /**************************************************
 说明：SPI1端口相关
 **************************************************/

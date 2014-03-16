@@ -16,6 +16,7 @@
 #include "lcd_tft.h"
 #include "num_operation.h"
 #include "word.h"
+#include "spi_devices.h"
 
 
 #if (LCD_DMA_CLR_EN > 0) || (LCD_DMA_DAT_EN > 0)
@@ -140,6 +141,29 @@ void LCD_SetCursor(LCD_CursorDat * Pos)
         LCD_WriteCmd(LCD_SET_PAGE_ADDRESS);       //设置行地址
     LCD_WriteDat(Pos->Y >> 8);
     LCD_WriteDat(Pos->Y & 0x00ff);
+    LCD_WriteDat(TFT_7inch_YSize >> 8);
+    LCD_WriteDat(TFT_7inch_YSize & 0x00ff);
+}
+/*
+*************************************************************************************
+* 名    称：void LCD_SetCursorXY(Uint16 XDat,Uint16 YDat)
+* 功    能：LCD光标位置设置
+* 入口参数：Uint16 XDat 列地址
+            Uint16 YDat 行地址
+* 出口参数：无
+*************************************************************************************
+*/
+void LCD_SetCursorXY(Uint16 XDat,Uint16 YDat)
+{
+    LCD_WriteCmd(LCD_SET_COLUMN_ADDRESS);     //设置列地址
+    LCD_WriteDat(XDat >> 8);
+    LCD_WriteDat(XDat & 0x00ff);
+    LCD_WriteDat(TFT_7inch_XSize >> 8);
+    LCD_WriteDat(TFT_7inch_XSize & 0x00ff);
+    
+    LCD_WriteCmd(LCD_SET_PAGE_ADDRESS);       //设置行地址
+    LCD_WriteDat(YDat >> 8);
+    LCD_WriteDat(YDat & 0x00ff);
     LCD_WriteDat(TFT_7inch_YSize >> 8);
     LCD_WriteDat(TFT_7inch_YSize & 0x00ff);
 }
@@ -367,13 +391,13 @@ void LCD_DrawCircle(LCD_CursorDat * Center,LCD_CursorDat * Any,Uint16 Color)
     CenterPoint.Color = Color;
     x = Any->X - Center->X;
     y = Any->Y - Center->Y;
-    r = sqrt(x * x + y * y);             //已知圆心及圆上一点，求半径
+    r = sqrt(x * x + y * y);             //已知圆心及圆上一点，求半径 r2 = x2 + y2
     x = 0;
     y = r;
     d = 5.0 / 4 - r;
     while(x <= y){
         putdot(&CenterPoint,x,y);
-        if(d<0){
+        if(d < 0){
             d += x * 2.0 + 3;
         }
         else{
@@ -644,6 +668,56 @@ void LCD_Init(void)
                 0);                          //开启lcd控制及FSMC GPIO
     LCD_InitExt();                           //LCD命令初始化
     LCD_Clear(BLACK);                        //纯黑底色
+}
+
+/*
+*************************************************************************************
+* 名    称：void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
+* 功    能：LCD通过dma方式从spi flash读取 背景
+* 入口参数：Uint32 FlashAddr 背景图片在flash的地址
+* 出口参数：无
+*************************************************************************************
+*/
+Uint16 TFT_Buffer_RX[1024];		
+Uint8 TFT_Buffer_TX;
+Uint8 flag = 0;
+void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
+{
+    DMA_ControlDat  ControlDat;
+    Uint16 index;
+     
+   
+    ControlDat.DMA_PeripheralBaseAddr = 0x4000380c;        //SPI2->DR  外设地址
+    ControlDat.DMA_MemoryBaseAddr     = (Uint32)TFT_Buffer_RX;      //存储器地址
+    ControlDat.DMA_BufferSize         = 800;               //TFT 像素
+    
+    DMA_Config(&ControlDat,EN_DMA_SPI2);                   //配置DMA
+    
+    FlashEnable();                                         // Clr CS
+    SPI_FLASH_SendAddr(FlashAddr,MEM_READ);                //Send CMD and Address
+    
+    
+
+    LCD_SetCursorXY(0,0);                                  //设置光标
+    LCD_WriteCmd(LCD_WRITE_MEM_START);                     //开始写LCD内存命令
+    
+    while(1) {
+        SPI_FLASH_Read(FlashAddr,(Uint8 *)TFT_Buffer_RX,2048);
+        for(index = 0;index < 1024;index ++){
+            LCD_WriteDat(TFT_Buffer_RX[index]);
+        }
+        FlashAddr += 1024 * 2;
+        if(FlashAddr % (800 * 480 * 2) == 0){
+            LCD_SetCursorXY(0,0);                                  //设置光标
+            LCD_WriteCmd(LCD_WRITE_MEM_START);                     //开始写LCD内存命令
+        }
+        if(FlashAddr > 800 * 480 * 10){ 
+            FlashAddr = 0;
+        }
+    }
+    
+
+    DMA_ChannelCmd(EN_DMA_SPI2,ENABLE);                    //开始DMA传输
 }
 
 

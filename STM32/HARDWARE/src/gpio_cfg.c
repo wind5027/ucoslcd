@@ -94,22 +94,40 @@ void GPIO_Config(Uint16 GPIOMask , Uint16 FMask)
         GPIO_Init(LCD_RST_PORT,&GPIO_InitStructure);        
     }
     if(ReadMask(GPIOMask,EN_GPIO_SPI1) == EN_GPIO_SPI1){
-        RCC_APB2PeriphClockCmd(RCC_SPI1_PORT , ENABLE);      //开启SPI1端口时钟
+        RCC_APB2PeriphClockCmd(RCC_SPI1_PORT , ENABLE);     //开启SPI1端口时钟
         
-        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;    //SPI1为输出口
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;   //SPI1为输出口
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
+        GPIO_InitStructure.GPIO_Pin   = FLASH_CS_PIN;       //cs为输出口      
+        GPIO_Init(FLASH_CS_PORT,&GPIO_InitStructure);
+
+        GPIO_InitStructure.GPIO_Pin   = FM_CS_PIN;          //cs为输出口
+        GPIO_Init(FM_CS_PORT,&GPIO_InitStructure);
+        
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;    //SPI1为复用输出口  
         GPIO_InitStructure.GPIO_Pin   = SPI1_PIN;      
-        GPIO_Init(LCD_RST_PORT,&GPIO_InitStructure); 
+        GPIO_Init(SPI1_PORT,&GPIO_InitStructure); 
     }
     if(ReadMask(GPIOMask,EN_GPIO_SPI2) == EN_GPIO_SPI2){
-        RCC_APB2PeriphClockCmd(RCC_SPI2_PORT , ENABLE);      //开启SPI2端口时钟
+        RCC_APB2PeriphClockCmd(RCC_SPI2_PORT , ENABLE);     //开启SPI2端口时钟
+        RCC_APB2PeriphClockCmd(RCC_FLASH_CS_PORT , ENABLE); //开启CS端口时钟
         
-        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;    //SPI2为输出口
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;   //SPI2 CS为输出口
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
+        GPIO_InitStructure.GPIO_Pin   = FLASH_CS_PIN;       //cs为输出口      
+        GPIO_Init(FLASH_CS_PORT,&GPIO_InitStructure);
+
+        GPIO_InitStructure.GPIO_Pin   = FM_CS_PIN;          //cs为输出口
+        GPIO_Init(FM_CS_PORT,&GPIO_InitStructure);
+        
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;    //SPI2为复用输出口       
         GPIO_InitStructure.GPIO_Pin   = SPI2_PIN;      
-        GPIO_Init(LCD_RST_PORT,&GPIO_InitStructure); 
+        GPIO_Init(SPI2_PORT,&GPIO_InitStructure); 
+        
+        FlashDisable();
+        FMDisable();
     }
 }
 /*************************************************************************************

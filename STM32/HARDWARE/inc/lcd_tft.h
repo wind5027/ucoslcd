@@ -21,8 +21,8 @@
 0 关闭 液晶采用直接驱动方式
 1 开启 液晶采用DMA驱动方式
 **************************************************/
-#define  LCD_DMA_CLR_EN       (0)
-#define  LCD_DMA_DAT_EN       (0)
+#define  LCD_DMA_CLR_EN       (1)
+#define  LCD_DMA_DAT_EN       (1)
 
 /**************************************************
 说明：LCD显示缓存 
@@ -328,13 +328,14 @@ extern DMA_ControlDat LcdDmaDat;
 
 /*
 *************************************************************************************
-* 名    称：void LCD_SetCursor(LCD_CursorDat * Pos)
+* 名    称：void LCD_SetCursorXY(Uint16 XDat,Uint16 YDat)
 * 功    能：LCD光标位置设置
-* 入口参数：LCD_CursorDat * Pos
+* 入口参数：Uint16 XDat 列地址
+            Uint16 YDat 行地址
 * 出口参数：无
 *************************************************************************************
 */
-extern void LCD_SetCursor(LCD_CursorDat * Pos);
+extern void LCD_SetCursorXY(Uint16 XDat,Uint16 YDat);
 
 /*
 *************************************************************************************
@@ -419,6 +420,17 @@ extern Uint8 LCD_DrawCoordinate(CoordinateDisDat * Disp);
 *************************************************************************************
 */
 extern Uint8 LCD_DrawChart(ChartDat *Disp);
+
+
+/*
+*************************************************************************************
+* 名    称：void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
+* 功    能：LCD通过dma方式从spi flash读取 背景
+* 入口参数：Uint32 FlashAddr 背景图片在flash的地址
+* 出口参数：无
+*************************************************************************************
+*/
+extern void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr);
 
 
 

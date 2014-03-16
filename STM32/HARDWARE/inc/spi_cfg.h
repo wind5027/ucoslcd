@@ -14,6 +14,7 @@
 #include "user_type.h"
 #include "stm32f10x.h"
 
+#define SPI2_DR_Addr   (Uint32)(0x4000380c)
 
 /*
 *************************************************************************************
@@ -30,13 +31,35 @@ extern void SPI1_Config(void);
 
 /*
 *************************************************************************************
-* 名    称：Uint8 SPI_ReadWriteByte(Uint8 TxData)
+* 名    称：Uint16 SPI1_ReadWriteByte(Uint16 TxData
 * 功    能：SPI发送/接收单字节数据
-* 入口参数：Uint8 TxData
-* 出口参数：Uint8 RxData
+* 入口参数：Uint16 TxData
+* 出口参数：Uint16 RxData
 *************************************************************************************
 */
-extern Uint8 SPI1_ReadWriteByte(Uint8 TxData);
+extern Uint16 SPI1_ReadWriteByte(Uint16 TxData);
+
+
+/*
+*************************************************************************************
+* 名    称：void SPI2_Config(void)
+* 功    能：SPI配置
+* 入口参数：无
+* 出口参数：无
+*************************************************************************************
+*/
+extern void SPI2_Config(void);
+
+
+/*
+*************************************************************************************
+* 名    称：Uint16 SPI2_ReadWriteByte(Uint16 TxData)
+* 功    能：SPI发送/接收单字节数据
+* 入口参数：Uint16 TxData
+* 出口参数：Uint16 RxData
+*************************************************************************************
+*/
+extern Uint16 SPI2_ReadWriteByte(Uint16 TxData);
 
 
 

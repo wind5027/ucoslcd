@@ -80,12 +80,10 @@ typedef struct
 **************************************************/
 typedef struct 
 {
-    Uint32 DMA_PeripheralBaseAddr;
-    Uint32 DMA_MemoryBaseAddr;
-    Uint16 DMA_BufferSize;
+    Uint32 DMA_PeripheralBaseAddr;    //外设地址
+    Uint32 DMA_MemoryBaseAddr;        //存储器地址 
+    Uint32 DMA_BufferSize;            //数据传输数量
     Uint16 DMA_Mode;
-    Uint8  DMA_InterruptCnt;
-    Uint8  DMA_InterruptMax;
 }DMA_ControlDat;
 
 

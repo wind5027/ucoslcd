@@ -20,6 +20,7 @@
 #define EN_DMA_LCD_CLR            ((Uint16)0x0001)
 #define EN_DMA_LCD_DAT            ((Uint16)0x0002)
 #define EN_DMA_SPI1               ((Uint16)0x1000)
+#define EN_DMA_SPI2               ((Uint16)0x2000)
 
 
 

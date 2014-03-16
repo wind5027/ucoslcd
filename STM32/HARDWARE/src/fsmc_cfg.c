@@ -29,12 +29,12 @@ void FSMC_Config(Uint16 FSMCMask,FunctionalState NewState)
     if (ReadMask(FSMCMask,EN_FSMC_PSRAM) == EN_FSMC_PSRAM){
         RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC,NewState);                                 //开启FSMC模块时钟
         
-        FSMC_NORSRAMTimingInitStructure.FSMC_AddressSetupTime      = 1;
-        FSMC_NORSRAMTimingInitStructure.FSMC_AddressHoldTime       = 1;
-        FSMC_NORSRAMTimingInitStructure.FSMC_DataSetupTime         = 16;
-        FSMC_NORSRAMTimingInitStructure.FSMC_BusTurnAroundDuration = 1;
-        FSMC_NORSRAMTimingInitStructure.FSMC_CLKDivision           = 16;
-        FSMC_NORSRAMTimingInitStructure.FSMC_DataLatency           = 1;
+        FSMC_NORSRAMTimingInitStructure.FSMC_AddressSetupTime      = 0;
+        FSMC_NORSRAMTimingInitStructure.FSMC_AddressHoldTime       = 0;
+        FSMC_NORSRAMTimingInitStructure.FSMC_DataSetupTime         = 1;
+        FSMC_NORSRAMTimingInitStructure.FSMC_BusTurnAroundDuration = 0;
+        FSMC_NORSRAMTimingInitStructure.FSMC_CLKDivision           = 0;
+        FSMC_NORSRAMTimingInitStructure.FSMC_DataLatency           = 0;
         FSMC_NORSRAMTimingInitStructure.FSMC_AccessMode            = FSMC_AccessMode_B;
         
         FSMC_NORSRAMInitStructure.FSMC_Bank                        = FSMC_Bank1_NORSRAM1;
