@@ -701,7 +701,7 @@ void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
     LCD_SetCursorXY(0,0);                                  //设置光标
     LCD_WriteCmd(LCD_WRITE_MEM_START);                     //开始写LCD内存命令
     
-    while(1) {
+    while(FlashAddr != (800 * 480 * 2)) {
         SPI_FLASH_Read(FlashAddr,(Uint8 *)TFT_Buffer_RX,2048);
         for(index = 0;index < 1024;index ++){
             LCD_WriteDat(TFT_Buffer_RX[index]);
@@ -711,13 +711,13 @@ void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
             LCD_SetCursorXY(0,0);                                  //设置光标
             LCD_WriteCmd(LCD_WRITE_MEM_START);                     //开始写LCD内存命令
         }
-        if(FlashAddr > 800 * 480 * 10){ 
+        if(FlashAddr > 800 * 480 * 2){ 
             FlashAddr = 0;
         }
     }
     
 
-    DMA_ChannelCmd(EN_DMA_SPI2,ENABLE);                    //开始DMA传输
+//    DMA_ChannelCmd(EN_DMA_SPI2,ENABLE);                    //开始DMA传输
 }
 
 

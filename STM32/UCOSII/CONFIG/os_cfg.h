@@ -1,124 +1,143 @@
 /*
 *********************************************************************************************************
-uC/OS-II实时控制内核
-主要的包含文件
-
-文 件: OS_CFG.H ucos内核构造文件
-作 者: Jean J. Labrosse
+*                                                uC/OS-II
+*                                          The Real-Time Kernel
+*                                  uC/OS-II Configuration File for V2.9x
+*
+*                               (c) Copyright 2005-2010, Micrium, Weston, FL
+*                                          All Rights Reserved
+*
+*
+* File    : OS_CFG.H
+* By      : Jean J. Labrosse
+* Version : V2.92
+*
+* LICENSING TERMS:
+* ---------------
+*   uC/OS-II is provided in source form for FREE evaluation, for educational use or for peaceful research.
+* If you plan on using  uC/OS-II  in a commercial product you need to contact Micri�m to properly license
+* its use in your product. We provide ALL the source code for your convenience and to help you experience
+* uC/OS-II.   The fact that the  source is provided does  NOT  mean that you can use it without  paying a
+* licensing fee.
 *********************************************************************************************************
 */
 
-
-#ifndef __OS_CFG_H__
-#define __OS_CFG_H__
-
-//*********************************************************************************************************
-//uC/OS-II 的内核构造
-
-#define OS_MAX_EVENTS            20    //应用中最多事件控制块的数目 必须大于0                                                                       
-#define OS_MAX_FLAGS              6    //应用中最多事件标志组的数目	必须大于 0							  
-#define OS_MAX_MEM_PART           6    //最多内存块的数目           MUST be > 0 							 
-#define OS_MAX_QS                 6    //应用中最多对列控制块的数目	MUST be > 0					   
-#define OS_MAX_TASKS             20    //应用中最多任务数目			MUST be >= 2 					  
-#define OS_LOWEST_PRIO           22    //定义任务的最低优先级		不得大于 63
-#define OS_TASK_IDLE_STK_SIZE    64    //统计任务堆栈容量( # 按照OS_STK的宽度数目) 
-
-#define OS_TASK_STAT_EN           1    //允许 (1) 或者禁止 (0) 统计任务
-#define OS_TASK_STAT_STK_SIZE    64    //空闲任务堆栈容量 (#按照OS_STK的宽度数目) 
-
-#define OS_ARG_CHK_EN             1    //允许 (1) 或者禁止 (0) 变量检查
-#define OS_CPU_HOOKS_EN           1    //在处理器移植文件中允许使用 uC/OS-II 的接口函数
+#ifndef OS_CFG_H
+#define OS_CFG_H
 
 
-                                       // ----------------------- 事件标志管理 ------------------------ 
-#define OS_FLAG_EN                1    //允许 (1) 或者禁止 (0) 产生事件标志相关代码
-#define OS_FLAG_WAIT_CLR_EN       1    //允许生成 Wait on Clear 事件标志代码
-#define OS_FLAG_ACCEPT_EN         1    //允许生成 OSFlagAccept()                          
-#define OS_FLAG_DEL_EN            1    //允许生成 OSFlagDel()
-#define OS_FLAG_QUERY_EN          1    //允许生成 OSFlagQuery() 
+/* ---------------------- MISCELLANEOUS ----------------------- */
+#define OS_APP_HOOKS_EN           0u   /* Application-defined hooks are called from the uC/OS-II hooks */
+#define OS_ARG_CHK_EN             0u   /* Enable (1) or Disable (0) argument checking                  */
+#define OS_CPU_HOOKS_EN           0u   /* uC/OS-II hooks are found in the processor port files         */
+
+#define OS_DEBUG_EN               0u   /* Enable(1) debug variables                                    */
+
+#define OS_EVENT_MULTI_EN         1u   /* Include code for OSEventPendMulti()                          */
+#define OS_EVENT_NAME_EN          1u   /* Enable names for Sem, Mutex, Mbox and Q                      */
+
+#define OS_LOWEST_PRIO           63u   /* Defines the lowest priority that can be assigned ...         */
+/* ... MUST NEVER be higher than 254!                           */
+
+#define OS_MAX_EVENTS            80u   /* Max. number of event control blocks in your application      */
+#define OS_MAX_FLAGS              5u   /* Max. number of Event Flag Groups    in your application      */
+#define OS_MAX_MEM_PART           5u   /* Max. number of memory partitions                             */
+#define OS_MAX_QS                 4u   /* Max. number of queue control blocks in your application      */
+#define OS_MAX_TASKS             20u   /* Max. number of tasks in your application, MUST be >= 2       */
+
+#define OS_SCHED_LOCK_EN          1u   /* Include code for OSSchedLock() and OSSchedUnlock()           */
+
+#define OS_TICK_STEP_EN           1u   /* Enable tick stepping feature for uC/OS-View                  */
+#define OS_TICKS_PER_SEC        100u   /* Set the number of ticks in one second                        */
 
 
-                                       // -------------------- 消息邮箱管理--------------------- 
-#define OS_MBOX_EN                1    //允许 (1) 或者禁止 (0) 产生消息邮箱相关代码
-#define OS_MBOX_ACCEPT_EN         1    //允许生成 OSMboxAccept()
-#define OS_MBOX_DEL_EN            1    //允许生成 OSMboxDel() 
-#define OS_MBOX_POST_EN           1    //允许生成 OSMboxPost()
-#define OS_MBOX_POST_OPT_EN       1    //允许生成 OSMboxPostOpt() 
-#define OS_MBOX_QUERY_EN          1    //允许生成 OSMboxQuery()
+/* --------------------- TASK STACK SIZE ---------------------- */
+#define OS_TASK_TMR_STK_SIZE    128u   /* Timer      task stack size (# of OS_STK wide entries)        */
+#define OS_TASK_STAT_STK_SIZE   128u   /* Statistics task stack size (# of OS_STK wide entries)        */
+#define OS_TASK_IDLE_STK_SIZE   128u   /* Idle       task stack size (# of OS_STK wide entries)        */
 
 
-                                       // ---------------------内存管理  -------------------- 
-#define OS_MEM_EN                 1    //允许 (1) 或者禁止 (0) 产生内存相关代码
-#define OS_MEM_QUERY_EN           1    //允许生成 OSMemQuery() 
+/* --------------------- TASK MANAGEMENT ---------------------- */
+#define OS_TASK_CHANGE_PRIO_EN    1u   /*     Include code for OSTaskChangePrio()                      */
+#define OS_TASK_CREATE_EN         1u   /*     Include code for OSTaskCreate()                          */
+#define OS_TASK_CREATE_EXT_EN     1u   /*     Include code for OSTaskCreateExt()                       */
+#define OS_TASK_DEL_EN            1u   /*     Include code for OSTaskDel()                             */
+#define OS_TASK_NAME_EN           1u   /*     Enable task names                                        */
+#define OS_TASK_PROFILE_EN        1u   /*     Include variables in OS_TCB for profiling                */
+#define OS_TASK_QUERY_EN          1u   /*     Include code for OSTaskQuery()                           */
+#define OS_TASK_REG_TBL_SIZE      1u   /*     Size of task variables array (#of INT32U entries)        */
+#define OS_TASK_STAT_EN           1u   /*     Enable (1) or Disable(0) the statistics task             */
+#define OS_TASK_STAT_STK_CHK_EN   1u   /*     Check task stacks from statistic task                    */
+#define OS_TASK_SUSPEND_EN        1u   /*     Include code for OSTaskSuspend() and OSTaskResume()      */
+#define OS_TASK_SW_HOOK_EN        1u   /*     Include code for OSTaskSwHook()                          */
 
 
-                                       // ---------------- 互斥型信号量管理 --------------- 
-#define OS_MUTEX_EN               1    //允许 (1) 或者禁止 (0) 产生互斥型信号量相关代码
-#define OS_MUTEX_ACCEPT_EN        1    //允许生成 OSMutexAccept()
-#define OS_MUTEX_DEL_EN           1    //允许生成 OSMutexDel()
-#define OS_MUTEX_QUERY_EN         1    //允许生成 OSMutexQuery() 
+/* ----------------------- EVENT FLAGS ------------------------ */
+#define OS_FLAG_EN                0u   /* Enable (1) or Disable (0) code generation for EVENT FLAGS    */
+#define OS_FLAG_ACCEPT_EN         1u   /*     Include code for OSFlagAccept()                          */
+#define OS_FLAG_DEL_EN            1u   /*     Include code for OSFlagDel()                             */
+#define OS_FLAG_NAME_EN           1u   /*     Enable names for event flag group                        */
+#define OS_FLAG_QUERY_EN          1u   /*     Include code for OSFlagQuery()                           */
+#define OS_FLAG_WAIT_CLR_EN       1u   /* Include code for Wait on Clear EVENT FLAGS                   */
+#define OS_FLAGS_NBITS           16u   /* Size in #bits of OS_FLAGS data type (8, 16 or 32)            */
 
 
-                                       // ---------------------- 消息队列号管理 ---------------------- 
-#define OS_Q_EN                   1    //允许 (1) 或者禁止 (0) 产生消息队列相关代码
-#define OS_Q_ACCEPT_EN            1    //允许生成 OSQAccept() 
-#define OS_Q_DEL_EN               1    //允许生成 OSQDel()
-#define OS_Q_FLUSH_EN             1    //允许生成 OSQFlush() 
-#define OS_Q_POST_EN              1    //允许生成 OSQPost() 
-#define OS_Q_POST_FRONT_EN        1    //允许生成 OSQPostFront()
-#define OS_Q_POST_OPT_EN          1    //允许生成OSQPostOpt()                          
-#define OS_Q_QUERY_EN             1    //允许生成OSQQuery()  
+/* -------------------- MESSAGE MAILBOXES --------------------- */
+#define OS_MBOX_EN                1u   /* Enable (1) or Disable (0) code generation for MAILBOXES      */
+#define OS_MBOX_ACCEPT_EN         1u   /*     Include code for OSMboxAccept()                          */
+#define OS_MBOX_DEL_EN            1u   /*     Include code for OSMboxDel()                             */
+#define OS_MBOX_PEND_ABORT_EN     1u   /*     Include code for OSMboxPendAbort()                       */
+#define OS_MBOX_POST_EN           1u   /*     Include code for OSMboxPost()                            */
+#define OS_MBOX_POST_OPT_EN       1u   /*     Include code for OSMboxPostOpt()                         */
+#define OS_MBOX_QUERY_EN          1u   /*     Include code for OSMboxQuery()                           */
 
 
-                                       // ------------------------ 信号管理 ------------------------ 
-#define OS_SEM_EN                 1    //允许 (1) 或者禁止 (0) 产生信号量相关代码
-#define OS_SEM_ACCEPT_EN          1    //允许生成OSSemAccept()                            
-#define OS_SEM_DEL_EN             1    //允许生成OSSemDel()                               
-#define OS_SEM_QUERY_EN           1    //允许生成OSSemQuery()                             
+/* --------------------- MEMORY MANAGEMENT -------------------- */
+#define OS_MEM_EN                 1u   /* Enable (1) or Disable (0) code generation for MEMORY MANAGER */
+#define OS_MEM_NAME_EN            1u   /*     Enable memory partition names                            */
+#define OS_MEM_QUERY_EN           1u   /*     Include code for OSMemQuery()                            */
 
 
-                                       // ---------------------任务管理  ---------------------- 
-#define OS_TASK_CHANGE_PRIO_EN    1    //允许生成OSTaskChangePrio()                    
-#define OS_TASK_CREATE_EN         1    //允许生成OSTaskCreate()                          
-#define OS_TASK_CREATE_EXT_EN     1    //允许生成OSTaskCreateExt()                       
-#define OS_TASK_DEL_EN            1    //允许生成OSTaskDel()                             
-#define OS_TASK_SUSPEND_EN        1    //允许生成OSTaskSuspend() and OSTaskResume()      
-#define OS_TASK_QUERY_EN          1    //允许生成OSTaskQuery()                           
+/* ---------------- MUTUAL EXCLUSION SEMAPHORES --------------- */
+#define OS_MUTEX_EN               1u   /* Enable (1) or Disable (0) code generation for MUTEX          */
+#define OS_MUTEX_ACCEPT_EN        1u   /*     Include code for OSMutexAccept()                         */
+#define OS_MUTEX_DEL_EN           1u   /*     Include code for OSMutexDel()                            */
+#define OS_MUTEX_QUERY_EN         1u   /*     Include code for OSMutexQuery()                          */
 
 
-                                       // --------------------- -时间管理 ---------------------- 
-#define OS_TIME_DLY_HMSM_EN       1    //允许生成OSTimeDlyHMSM()                         
-#define OS_TIME_DLY_RESUME_EN     1    //允许生成OSTimeDlyResume()                       
-#define OS_TIME_GET_SET_EN        1    //允许生成OSTimeGet() and OSTimeSet()             
+/* ---------------------- MESSAGE QUEUES ---------------------- */
+#define OS_Q_EN                   1u   /* Enable (1) or Disable (0) code generation for QUEUES         */
+#define OS_Q_ACCEPT_EN            1u   /*     Include code for OSQAccept()                             */
+#define OS_Q_DEL_EN               1u   /*     Include code for OSQDel()                                */
+#define OS_Q_FLUSH_EN             1u   /*     Include code for OSQFlush()                              */
+#define OS_Q_PEND_ABORT_EN        1u   /*     Include code for OSQPendAbort()                          */
+#define OS_Q_POST_EN              1u   /*     Include code for OSQPost()                               */
+#define OS_Q_POST_FRONT_EN        1u   /*     Include code for OSQPostFront()                          */
+#define OS_Q_POST_OPT_EN          1u   /*     Include code for OSQPostOpt()                            */
+#define OS_Q_QUERY_EN             1u   /*     Include code for OSQQuery()                              */
 
 
-                                       // ---------------------- 混合管理 ----------------------- 
-#define OS_SCHED_LOCK_EN          1    //允许生成OSSchedLock() and OSSchedUnlock()       
+/* ------------------------ SEMAPHORES ------------------------ */
+#define OS_SEM_EN                 1u   /* Enable (1) or Disable (0) code generation for SEMAPHORES     */
+#define OS_SEM_ACCEPT_EN          1u   /*    Include code for OSSemAccept()                            */
+#define OS_SEM_DEL_EN             1u   /*    Include code for OSSemDel()                               */
+#define OS_SEM_PEND_ABORT_EN      1u   /*    Include code for OSSemPendAbort()                         */
+#define OS_SEM_QUERY_EN           1u   /*    Include code for OSSemQuery()                             */
+#define OS_SEM_SET_EN             1u   /*    Include code for OSSemSet()                               */
 
 
-#define OS_TICKS_PER_SEC          100  //设置每秒的节拍数目                       
+/* --------------------- TIME MANAGEMENT ---------------------- */
+#define OS_TIME_DLY_HMSM_EN       1u   /*     Include code for OSTimeDlyHMSM()                         */
+#define OS_TIME_DLY_RESUME_EN     1u   /*     Include code for OSTimeDlyResume()                       */
+#define OS_TIME_GET_SET_EN        1u   /*     Include code for OSTimeGet() and OSTimeSet()             */
+#define OS_TIME_TICK_HOOK_EN      1u   /*     Include code for OSTimeTickHook()                        */
 
 
-//typedef INT16U             OS_FLAGS;   // Date type for event flag bits (8, 16 or 32 bits)             
-typedef unsigned short            OS_FLAGS;   //事件标志的数据类型 (8位, 16位 或 32 位)	   
+/* --------------------- TIMER MANAGEMENT --------------------- */
+#define OS_TMR_EN                 1u   /* Enable (1) or Disable (0) code generation for TIMERS         */
+#define OS_TMR_CFG_MAX           16u   /*     Maximum number of timers                                 */
+#define OS_TMR_CFG_NAME_EN        1u   /*     Determine timer names                                    */
+#define OS_TMR_CFG_WHEEL_SIZE     8u   /*     Size of timer wheel (#Spokes)                            */
+#define OS_TMR_CFG_TICKS_PER_SEC 10u   /*     Rate at which timer management task runs (Hz)            */
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

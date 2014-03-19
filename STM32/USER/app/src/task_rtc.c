@@ -54,7 +54,8 @@ void TaskRTCUpdate(void *pdata)
     CharDat.DisP   = TmpBuf;
     for(;;){
         CurrentTime = OSMemGet(MEMPointer,&err);      //申请内存空间
-        if(err == OS_NO_ERR){
+        if(err == 0)//OS_NO_ERR)
+            {
             RTCDisBuf = (NUM_DisBuf *)(CurrentTime + sizeof(TimeDat));
             WordDisCP = (WordDisBuf *)(CurrentTime + sizeof(TimeDat) + sizeof(NUM_DisBuf));
             CordDat   = (CoordinateDisDat *)(CurrentTime + sizeof(TimeDat) + sizeof(NUM_DisBuf) + sizeof(WordDisBuf));

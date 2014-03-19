@@ -1,207 +1,411 @@
-﻿/*
+/*
 *********************************************************************************************************
-* uC/OS-II实时控制内核
-* 主要的包含文件
-* 文 件: uCOS_II.H ucos内部函数参数设定
-* 作 者: Jean J. Labrosse
+*                                              uC/OS-II
+*                                        The Real-Time Kernel
+*
+*                            (c) Copyright 1992-2012, Micrium, Weston, FL
+*                                           All Rights Reserved
+*
+* File    : uCOS_II.H
+* By      : Jean J. Labrosse
+* Version : V2.92.07
+*
+* LICENSING TERMS:
+* ---------------
+*   uC/OS-II is provided in source form for FREE evaluation, for educational use or for peaceful research.
+* If you plan on using  uC/OS-II  in a commercial product you need to contact Micrium to properly license
+* its use in your product. We provide ALL the source code for your convenience and to help you experience
+* uC/OS-II.   The fact that the  source is provided does  NOT  mean that you can use it without  paying a
+* licensing fee.
 *********************************************************************************************************
 */
-#include "includes.h"
-#include "os_cpu.h"
-#include "os_cfg.h"
 
-//混杂的定义
-#define  OS_VERSION              252       //定义UCOSII的版本号,这里是2.52版本
+#ifndef   OS_uCOS_II_H
+#define   OS_uCOS_II_H
 
-#ifdef   OS_GLOBALS						   //如果 OS_GLOBALS 已被声明定义, 紧随代码将会被编译
-#define  OS_EXT							   //则定义 OS_EXT
-#else
-#define  OS_EXT  extern					   //否则，定义 OS_EXT 为 extern
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+/*
+*********************************************************************************************************
+*                                       uC/OS-II VERSION NUMBER
+*********************************************************************************************************
+*/
 
-//这里在stm32f10x_type.h里面用枚举的方式定义了，所以不需要再定义了
-//#ifndef  FALSE						   //是否未定义 FALSE
-//#define  FALSE                     0	   //如果没定义则定义 FALSE 为 0
-//#endif
-//
-//#ifndef  TRUE							   //是否未定义 TRUE
-//#define  TRUE                      1	   //如果没定义则定义 TRUE 为 1
-//#endif
+#define  OS_VERSION                 29207u              /* Version of uC/OS-II (Vx.yy mult. by 10000)  */
 
-#define  OS_PRIO_SELF           0xFF       //定义 OS_PRIO_SELF 为 0xFF
+/*
+*********************************************************************************************************
+*                                        INCLUDE HEADER FILES
+*********************************************************************************************************
+*/
 
-#if OS_TASK_STAT_EN > 0
-#define  OS_N_SYS_TASKS            2       //系统任务数为2   
+#include <app_cfg.h>
+#include <os_cfg.h>
+#include <os_cpu.h>
+
+/*
+*********************************************************************************************************
+*                                            MISCELLANEOUS
+*********************************************************************************************************
+*/
+
+#ifdef   OS_GLOBALS
+#define  OS_EXT
 #else
-#define  OS_N_SYS_TASKS            1	   //系统任务数为1 
+#define  OS_EXT  extern
 #endif
 
-#define  OS_STAT_PRIO       (OS_LOWEST_PRIO - 1)        //统计任务优先级
-#define  OS_IDLE_PRIO       (OS_LOWEST_PRIO)            //空闲任务优先级 
+#ifndef  OS_FALSE
+#define  OS_FALSE                       0u
+#endif
 
-#define  OS_EVENT_TBL_SIZE ((OS_LOWEST_PRIO) / 8 + 1)   //事件列表大小
-#define  OS_RDY_TBL_SIZE   ((OS_LOWEST_PRIO) / 8 + 1)   //就绪列表大小
+#ifndef  OS_TRUE
+#define  OS_TRUE                        1u
+#endif
 
-#define  OS_TASK_IDLE_ID       65535                    //定义两个系统任务的ID
-#define  OS_TASK_STAT_ID       65534
+#define  OS_ASCII_NUL            (INT8U)0
 
-#define  OS_EVENT_EN       (((OS_Q_EN > 0) && (OS_MAX_QS > 0)) || (OS_MBOX_EN > 0) || (OS_SEM_EN > 0) || (OS_MUTEX_EN > 0))
+#define  OS_PRIO_SELF                0xFFu              /* Indicate SELF priority                      */
+#define  OS_PRIO_MUTEX_CEIL_DIS      0xFFu              /* Disable mutex priority ceiling promotion    */
 
-//*********************************************************************************************************
-//任务状态字 TASK STATUS (OSTCBStat的位定义)       
-#define  OS_STAT_RDY            0x00        // (将任务的状态字)处于就绪状态
-#define  OS_STAT_SEM            0x01        // (将任务的状态字)处于信号量状态                               
-#define  OS_STAT_MBOX           0x02        // (将任务的状态字)处于邮箱状态  
-#define  OS_STAT_Q              0x04        // (将任务的状态字)处于Q状态
-#define  OS_STAT_SUSPEND        0x08        // 表示任务被挂起
-#define  OS_STAT_MUTEX          0x10        // (将任务的状态字)处于MUTEX状态
-#define  OS_STAT_FLAG           0x20        // (将任务的状态字)处于FLAG状态
+#if OS_TASK_STAT_EN > 0u
+#define  OS_N_SYS_TASKS                 2u              /* Number of system tasks                      */
+#else
+#define  OS_N_SYS_TASKS                 1u
+#endif
 
-//*********************************************************************************************************
-//事件类型(OS_EVENT types)
-#define  OS_EVENT_TYPE_UNUSED      0        // 定义事件类型的种类(无事件类型------------0)
-#define  OS_EVENT_TYPE_MBOX        1		// 定义事件类型的种类(邮箱为数字序列--------1)
-#define  OS_EVENT_TYPE_Q           2		// 定义事件类型的种类(消息队列为数字序列----2)
-#define  OS_EVENT_TYPE_SEM         3	    // 定义事件类型的种类(信号量为数字序列------3)
-#define  OS_EVENT_TYPE_MUTEX       4	    // 定义事件类型的种类(互斥型信号量为数字序列4)
-#define  OS_EVENT_TYPE_FLAG        5		// 定义事件类型的种类(事件标志组为数字序列--5)
+#define  OS_TASK_STAT_PRIO  (OS_LOWEST_PRIO - 1u)       /* Statistic task priority                     */
+#define  OS_TASK_IDLE_PRIO  (OS_LOWEST_PRIO)            /* IDLE      task priority                     */
+#define  OS_TASK_TMR_PRIO   (0)                         /* ��ʱ��Ϊ������ȼ�                          */
 
-//*********************************************************************************************************
-//事件标志(EVENT FLAGS)
-#define  OS_FLAG_WAIT_CLR_ALL      0        // 定义所有指定事件标志位清0 ------ 0
-#define  OS_FLAG_WAIT_CLR_AND      0
+#if OS_LOWEST_PRIO <= 63u
+#define  OS_EVENT_TBL_SIZE ((OS_LOWEST_PRIO) / 8u + 1u) /* Size of event table                         */
+#define  OS_RDY_TBL_SIZE   ((OS_LOWEST_PRIO) / 8u + 1u) /* Size of ready table                         */
+#else
+#define  OS_EVENT_TBL_SIZE ((OS_LOWEST_PRIO) / 16u + 1u)/* Size of event table                         */
+#define  OS_RDY_TBL_SIZE   ((OS_LOWEST_PRIO) / 16u + 1u)/* Size of ready table                         */
+#endif
 
-#define  OS_FLAG_WAIT_CLR_ANY      1        // 定义任意指定事件标志位清0 ------ 1
-#define  OS_FLAG_WAIT_CLR_OR       1
+#define  OS_TASK_IDLE_ID            65535u              /* ID numbers for Idle, Stat and Timer tasks   */
+#define  OS_TASK_STAT_ID            65534u
+#define  OS_TASK_TMR_ID             65533u
 
-#define  OS_FLAG_WAIT_SET_ALL      2        // 定义所有指定事件标志位置1 ------ 2
-#define  OS_FLAG_WAIT_SET_AND      2
+#define  OS_EVENT_EN           (((OS_Q_EN > 0u) && (OS_MAX_QS > 0u)) || (OS_MBOX_EN > 0u) || (OS_SEM_EN > 0u) || (OS_MUTEX_EN > 0u))
 
-#define  OS_FLAG_WAIT_SET_ANY      3        // 定义任意指定事件标志位置1 ------ 3
-#define  OS_FLAG_WAIT_SET_OR       3
+#define  OS_TCB_RESERVED        ((OS_TCB *)1)
 
-// 如果需要在得到期望标志后，恢复该事件标志，加入此常量
-#define  OS_FLAG_CONSUME        0x80        // 定义常量OS_FLAG_CONSUME为0x80
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                             TASK STATUS (Bit definition for OSTCBStat)
+*********************************************************************************************************
+*/
+#define  OS_STAT_RDY                 0x00u  /* Ready to run                                            */
+#define  OS_STAT_SEM                 0x01u  /* Pending on semaphore                                    */
+#define  OS_STAT_MBOX                0x02u  /* Pending on mailbox                                      */
+#define  OS_STAT_Q                   0x04u  /* Pending on queue                                        */
+#define  OS_STAT_SUSPEND             0x08u  /* Task is suspended                                       */
+#define  OS_STAT_MUTEX               0x10u  /* Pending on mutual exclusion semaphore                   */
+#define  OS_STAT_FLAG                0x20u  /* Pending on event flag group                             */
+#define  OS_STAT_MULTI               0x80u  /* Pending on multiple events                              */
 
-											
-#define  OS_FLAG_CLR               0		// 定义 OS_FLAG_CLR 为清0
-#define  OS_FLAG_SET               1	    // 定义 OS_FLAG_SET 为置1
+#define  OS_STAT_PEND_ANY         (OS_STAT_SEM | OS_STAT_MBOX | OS_STAT_Q | OS_STAT_MUTEX | OS_STAT_FLAG)
 
-//*********************************************************************************************************
-//设置字在'opt'中，适用于 OSSemDel(), OSMboxDel(), OSQDel() 和 OSMutexDel()函数
-#define  OS_DEL_NO_PEND            0		// 可以选择只能在已经没有任何任务在等待该信号量时，才能删除该信号量
-#define  OS_DEL_ALWAYS             1		// 不管有没有任务在等待该信号量，立即删除该信号量
+/*
+*********************************************************************************************************
+*                          TASK PEND STATUS (Status codes for OSTCBStatPend)
+*********************************************************************************************************
+*/
+#define  OS_STAT_PEND_OK                0u  /* Pending status OK, not pending, or pending complete     */
+#define  OS_STAT_PEND_TO                1u  /* Pending timed out                                       */
+#define  OS_STAT_PEND_ABORT             2u  /* Pending aborted                                         */
 
-//*********************************************************************************************************
-//OS???PostOpt() OPTIONS(设置)
-//这些设置适用用 OSMboxPostOpt() 和 OSQPostOpt()两个函数.	 
-#define  OS_POST_OPT_NONE       0x00       	// 发送一个消息(或邮箱)给一个等待消息的优先级最高的任务
-#define  OS_POST_OPT_BROADCAST  0x01        // 发送消息给所有等待队列消息的任务 
-#define  OS_POST_OPT_FRONT      0x02        // 以后进先出方式发消息(仿真OSQPostFront())
+/*
+*********************************************************************************************************
+*                                           OS_EVENT types
+*********************************************************************************************************
+*/
+#define  OS_EVENT_TYPE_UNUSED           0u
+#define  OS_EVENT_TYPE_MBOX             1u
+#define  OS_EVENT_TYPE_Q                2u
+#define  OS_EVENT_TYPE_SEM              3u
+#define  OS_EVENT_TYPE_MUTEX            4u
+#define  OS_EVENT_TYPE_FLAG             5u
 
-//*********************************************************************************************************
-//任务设置 TASK OPTIONS (查看OSTaskCreateExt())   
-#define  OS_TASK_OPT_STK_CHK  0x0001        // 决定是否进行任务堆栈检查
-#define  OS_TASK_OPT_STK_CLR  0x0002        // 决定是否清空堆栈
-#define  OS_TASK_OPT_SAVE_FP  0x0004        // 决定是否保存浮点寄存器的数值。此项操作仅当处理器有浮点件时有效。保存操作由硬件相关的代码完成
+#define  OS_TMR_TYPE                  100u  /* Used to identify Timers ...                             */
+                                            /* ... (Must be different value than OS_EVENT_TYPE_xxx)    */
 
-//*********************************************************************************************************
-//错误代码 ERROR CODES
-#define OS_NO_ERR                 0			// 函数返回成功;
+/*
+*********************************************************************************************************
+*                                             EVENT FLAGS
+*********************************************************************************************************
+*/
+#define  OS_FLAG_WAIT_CLR_ALL           0u  /* Wait for ALL    the bits specified to be CLR (i.e. 0)   */
+#define  OS_FLAG_WAIT_CLR_AND           0u
 
-#define OS_ERR_EVENT_TYPE         1			// 不是指向事件(相关)类型的指针;
-#define OS_ERR_PEND_ISR           2			// 在中断服务子程序中调用 OS各种信号类Accept()函数.
-#define OS_ERR_POST_NULL_PTR      3			// 用户发出空指针。根据规则，这里不支持空指针;
-#define OS_ERR_PEVENT_NULL        4			// 'pevent'是指空指针;
-#define OS_ERR_POST_ISR           5			// 试图在中断服务子程序中调用OSMutexPost()函数[释放一个mutex];
-#define OS_ERR_QUERY_ISR          6			// 试图在中断子程序中调用OSMutexQuery()[得到mutex当前状态信息]
-#define OS_ERR_INVALID_OPT        7			// 定义的opt参数无效;
-#define OS_ERR_TASK_WAITING       8			// 有一个或一个以上的任务在等待消息队列中的消息;
+#define  OS_FLAG_WAIT_CLR_ANY           1u  /* Wait for ANY of the bits specified to be CLR (i.e. 0)   */
+#define  OS_FLAG_WAIT_CLR_OR            1u
 
-#define OS_TIMEOUT               10			// 消息没有在指定的周期数内送到;
-#define OS_TASK_NOT_EXIST        11			// 指定的任务不存;
+#define  OS_FLAG_WAIT_SET_ALL           2u  /* Wait for ALL    the bits specified to be SET (i.e. 1)   */
+#define  OS_FLAG_WAIT_SET_AND           2u
 
-#define OS_MBOX_FULL             20			// 消息邮箱已经包含了其他消息，不空;
+#define  OS_FLAG_WAIT_SET_ANY           3u  /* Wait for ANY of the bits specified to be SET (i.e. 1)   */
+#define  OS_FLAG_WAIT_SET_OR            3u
 
-#define OS_Q_FULL                30			// 消息队列中已经存满;
 
-#define OS_PRIO_EXIST            40			// 优先级为PIP的任务已经存在;
-#define OS_PRIO_ERR              41			// 参数中的任务原先优先级不存在;
-#define OS_PRIO_INVALID          42			// 参数指定的优先级大于OS_LOWEST_PRIO;
+#define  OS_FLAG_CONSUME             0x80u  /* Consume the flags if condition(s) satisfied             */
 
-#define OS_SEM_OVF               50			// 信号量的值溢出;
 
-#define OS_TASK_DEL_ERR          60			// 指定要删除的任务不存在
-#define OS_TASK_DEL_IDLE         61			// 错误操作，试图删除空闲任务(Idle task);
-#define OS_TASK_DEL_REQ          62			// 当前任务收到来自其他任务的删除请求;
-#define OS_TASK_DEL_ISR          63			// 错误操作，试图在中断处理程序中删除任务;
+#define  OS_FLAG_CLR                    0u
+#define  OS_FLAG_SET                    1u
 
-#define OS_NO_MORE_TCB           70			// 系统中没有OS_TCB可以分配给任务了;
+/*
+*********************************************************************************************************
+*                                     Values for OSTickStepState
+*
+* Note(s): This feature is used by uC/OS-View.
+*********************************************************************************************************
+*/
 
-#define OS_TIME_NOT_DLY          80			// 要唤醒的任务不在延时状态;
-#define OS_TIME_INVALID_MINUTES  81			// 参数错误，分钟数大于59;
-#define OS_TIME_INVALID_SECONDS  82			// 参数错误，秒数大于59
-#define OS_TIME_INVALID_MILLI    83			// 则返回参数错误，毫秒数大于999;
-#define OS_TIME_ZERO_DLY         84		    // 四个参数全为0
+#if OS_TICK_STEP_EN > 0u
+#define  OS_TICK_STEP_DIS               0u  /* Stepping is disabled, tick runs as normal               */
+#define  OS_TICK_STEP_WAIT              1u  /* Waiting for uC/OS-View to set OSTickStepState to _ONCE  */
+#define  OS_TICK_STEP_ONCE              2u  /* Process tick once and wait for next cmd from uC/OS-View */
+#endif
 
-#define OS_TASK_SUSPEND_PRIO     90			// 要挂起的任务不存在
-#define OS_TASK_SUSPEND_IDLE     91			// 试图挂起uC/OS-II中的空闲任务(Idle task)
+/*
+*********************************************************************************************************
+*      Possible values for 'opt' argument of OSSemDel(), OSMboxDel(), OSQDel() and OSMutexDel()
+*********************************************************************************************************
+*/
+#define  OS_DEL_NO_PEND                 0u
+#define  OS_DEL_ALWAYS                  1u
 
-#define OS_TASK_RESUME_PRIO     100		    // 要唤醒的任务不存在;
-#define OS_TASK_NOT_SUSPENDED   101			// 要唤醒的任务不在挂起状态
+/*
+*********************************************************************************************************
+*                                        OS???Pend() OPTIONS
+*
+* These #defines are used to establish the options for OS???PendAbort().
+*********************************************************************************************************
+*/
+#define  OS_PEND_OPT_NONE               0u  /* NO option selected                                      */
+#define  OS_PEND_OPT_BROADCAST          1u  /* Broadcast action to ALL tasks waiting                   */
 
-#define OS_MEM_INVALID_PART     110			// 没有空闲的内存区;
-#define OS_MEM_INVALID_BLKS     111			// 没有为每一个内存区建立至少2个内存块;
-#define OS_MEM_INVALID_SIZE     112			// 内存块大小不足以容纳一个指针变量;
-#define OS_MEM_NO_FREE_BLKS     113			// 内存区已经没有空间分配给内存块;
-#define OS_MEM_FULL             114			// 内存区已经不能再接受更多释放的内存块。这种情况说明用户程序出现
-#define OS_MEM_INVALID_PBLK     115
-#define OS_MEM_INVALID_PMEM     116		    // 'pmem'是空指针;
-#define OS_MEM_INVALID_PDATA    117			// pdata是空指针;
-#define OS_MEM_INVALID_ADDR     118			// 非法地址，即地址为空指针;
+/*
+*********************************************************************************************************
+*                                     OS???PostOpt() OPTIONS
+*
+* These #defines are used to establish the options for OSMboxPostOpt() and OSQPostOpt().
+*********************************************************************************************************
+*/
+#define  OS_POST_OPT_NONE            0x00u  /* NO option selected                                      */
+#define  OS_POST_OPT_BROADCAST       0x01u  /* Broadcast message to ALL tasks waiting                  */
+#define  OS_POST_OPT_FRONT           0x02u  /* Post to highest priority task waiting                   */
+#define  OS_POST_OPT_NO_SCHED        0x04u  /* Do not call the scheduler if this option is selected    */
 
-#define OS_ERR_NOT_MUTEX_OWNER  120			// 发出mutex的任务实际上并不占用mutex;
+/*
+*********************************************************************************************************
+*                                TASK OPTIONS (see OSTaskCreateExt())
+*********************************************************************************************************
+*/
+#define  OS_TASK_OPT_NONE          0x0000u  /* NO option selected                                      */
+#define  OS_TASK_OPT_STK_CHK       0x0001u  /* Enable stack checking for the task                      */
+#define  OS_TASK_OPT_STK_CLR       0x0002u  /* Clear the stack when the task is create                 */
+#define  OS_TASK_OPT_SAVE_FP       0x0004u  /* Save the contents of any floating-point registers       */
 
-#define OS_TASK_OPT_ERR         130			// 任务用OSTaskCreateExt()函数建立的时候没有指定
+/*
+*********************************************************************************************************
+*                          TIMER OPTIONS (see OSTmrStart() and OSTmrStop())
+*********************************************************************************************************
+*/
+#define  OS_TMR_OPT_NONE                0u  /* No option selected                                      */
 
-#define OS_ERR_DEL_ISR          140			// 试图在中断服务子程序中删除(消息、邮箱、信号量、消息对列、互斥型信号量)
-#define OS_ERR_CREATE_ISR       141			// 试图在中断服务子程序中建立(事件标志组、互斥型信号量);
+#define  OS_TMR_OPT_ONE_SHOT            1u  /* Timer will not automatically restart when it expires    */
+#define  OS_TMR_OPT_PERIODIC            2u  /* Timer will     automatically restart when it expires    */
 
-#define OS_FLAG_INVALID_PGRP    150			// pgrp是一个空指针;
-#define OS_FLAG_ERR_WAIT_TYPE   151			// 'wait_type'不是指定的参数之一;
-#define OS_FLAG_ERR_NOT_RDY     152			// 指定的事件标志没有发生;
-#define OS_FLAG_INVALID_OPT     153		    // opt不是指定的参数之一;
-#define OS_FLAG_GRP_DEPLETED    154			// 系统没有剩余的空闲事件标志组，需要更改OS_CFG.H中的事件标志组数目配置
+#define  OS_TMR_OPT_CALLBACK            3u  /* OSTmrStop() option to call 'callback' w/ timer arg.     */
+#define  OS_TMR_OPT_CALLBACK_ARG        4u  /* OSTmrStop() option to call 'callback' w/ new   arg.     */
 
-//*********************************************************************************************************
-//事件控制块(EVENT CONTROL BLOCK)
-#if (OS_EVENT_EN > 0) && (OS_MAX_EVENTS > 0)
-typedef struct {						   // 定义一个事件控制块结构(OS_EVENT)
-    INT8U   OSEventType;                   // 事件类型
-    INT8U   OSEventGrp;                    // 等待任务所在的组
-    INT16U  OSEventCnt;                    // 计数器(当事件是信号量时)
-    void   *OSEventPtr;                    // 指向消息或者消息队列的指针
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE]; // 等待任务列表
+/*
+*********************************************************************************************************
+*                                            TIMER STATES
+*********************************************************************************************************
+*/
+#define  OS_TMR_STATE_UNUSED            0u
+#define  OS_TMR_STATE_STOPPED           1u
+#define  OS_TMR_STATE_COMPLETED         2u
+#define  OS_TMR_STATE_RUNNING           3u
+
+/*
+*********************************************************************************************************
+*                                             ERROR CODES
+*********************************************************************************************************
+*/
+#define OS_ERR_NONE                     0u
+
+#define OS_ERR_EVENT_TYPE               1u
+#define OS_ERR_PEND_ISR                 2u
+#define OS_ERR_POST_NULL_PTR            3u
+#define OS_ERR_PEVENT_NULL              4u
+#define OS_ERR_POST_ISR                 5u
+#define OS_ERR_QUERY_ISR                6u
+#define OS_ERR_INVALID_OPT              7u
+#define OS_ERR_ID_INVALID               8u
+#define OS_ERR_PDATA_NULL               9u
+
+#define OS_ERR_TIMEOUT                 10u
+#define OS_ERR_EVENT_NAME_TOO_LONG     11u
+#define OS_ERR_PNAME_NULL              12u
+#define OS_ERR_PEND_LOCKED             13u
+#define OS_ERR_PEND_ABORT              14u
+#define OS_ERR_DEL_ISR                 15u
+#define OS_ERR_CREATE_ISR              16u
+#define OS_ERR_NAME_GET_ISR            17u
+#define OS_ERR_NAME_SET_ISR            18u
+#define OS_ERR_ILLEGAL_CREATE_RUN_TIME 19u
+
+#define OS_ERR_MBOX_FULL               20u
+
+#define OS_ERR_Q_FULL                  30u
+#define OS_ERR_Q_EMPTY                 31u
+
+#define OS_ERR_PRIO_EXIST              40u
+#define OS_ERR_PRIO                    41u
+#define OS_ERR_PRIO_INVALID            42u
+
+#define OS_ERR_SCHED_LOCKED            50u
+#define OS_ERR_SEM_OVF                 51u
+
+#define OS_ERR_TASK_CREATE_ISR         60u
+#define OS_ERR_TASK_DEL                61u
+#define OS_ERR_TASK_DEL_IDLE           62u
+#define OS_ERR_TASK_DEL_REQ            63u
+#define OS_ERR_TASK_DEL_ISR            64u
+#define OS_ERR_TASK_NAME_TOO_LONG      65u
+#define OS_ERR_TASK_NO_MORE_TCB        66u
+#define OS_ERR_TASK_NOT_EXIST          67u
+#define OS_ERR_TASK_NOT_SUSPENDED      68u
+#define OS_ERR_TASK_OPT                69u
+#define OS_ERR_TASK_RESUME_PRIO        70u
+#define OS_ERR_TASK_SUSPEND_IDLE       71u
+#define OS_ERR_TASK_SUSPEND_PRIO       72u
+#define OS_ERR_TASK_WAITING            73u
+
+#define OS_ERR_TIME_NOT_DLY            80u
+#define OS_ERR_TIME_INVALID_MINUTES    81u
+#define OS_ERR_TIME_INVALID_SECONDS    82u
+#define OS_ERR_TIME_INVALID_MS         83u
+#define OS_ERR_TIME_ZERO_DLY           84u
+#define OS_ERR_TIME_DLY_ISR            85u
+
+#define OS_ERR_MEM_INVALID_PART        90u
+#define OS_ERR_MEM_INVALID_BLKS        91u
+#define OS_ERR_MEM_INVALID_SIZE        92u
+#define OS_ERR_MEM_NO_FREE_BLKS        93u
+#define OS_ERR_MEM_FULL                94u
+#define OS_ERR_MEM_INVALID_PBLK        95u
+#define OS_ERR_MEM_INVALID_PMEM        96u
+#define OS_ERR_MEM_INVALID_PDATA       97u
+#define OS_ERR_MEM_INVALID_ADDR        98u
+#define OS_ERR_MEM_NAME_TOO_LONG       99u
+
+#define OS_ERR_NOT_MUTEX_OWNER        100u
+
+#define OS_ERR_FLAG_INVALID_PGRP      110u
+#define OS_ERR_FLAG_WAIT_TYPE         111u
+#define OS_ERR_FLAG_NOT_RDY           112u
+#define OS_ERR_FLAG_INVALID_OPT       113u
+#define OS_ERR_FLAG_GRP_DEPLETED      114u
+#define OS_ERR_FLAG_NAME_TOO_LONG     115u
+
+#define OS_ERR_PCP_LOWER              120u
+
+#define OS_ERR_TMR_INVALID_DLY        130u
+#define OS_ERR_TMR_INVALID_PERIOD     131u
+#define OS_ERR_TMR_INVALID_OPT        132u
+#define OS_ERR_TMR_INVALID_NAME       133u
+#define OS_ERR_TMR_NON_AVAIL          134u
+#define OS_ERR_TMR_INACTIVE           135u
+#define OS_ERR_TMR_INVALID_DEST       136u
+#define OS_ERR_TMR_INVALID_TYPE       137u
+#define OS_ERR_TMR_INVALID            138u
+#define OS_ERR_TMR_ISR                139u
+#define OS_ERR_TMR_NAME_TOO_LONG      140u
+#define OS_ERR_TMR_INVALID_STATE      141u
+#define OS_ERR_TMR_STOPPED            142u
+#define OS_ERR_TMR_NO_CALLBACK        143u
+
+#define OS_ERR_NO_MORE_ID_AVAIL       150u
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                         EVENT CONTROL BLOCK
+*********************************************************************************************************
+*/
+
+#if OS_LOWEST_PRIO <= 63u
+typedef  INT8U    OS_PRIO;
+#else
+typedef  INT16U   OS_PRIO;
+#endif
+
+#if (OS_EVENT_EN) && (OS_MAX_EVENTS > 0u)
+typedef struct os_event {
+    INT8U    OSEventType;                    /* Type of event control block (see OS_EVENT_TYPE_xxxx)    */
+    void    *OSEventPtr;                     /* Pointer to message or queue structure                   */
+    INT16U   OSEventCnt;                     /* Semaphore Count (not used if other EVENT type)          */
+    OS_PRIO  OSEventGrp;                     /* Group corresponding to tasks waiting for event to occur */
+    OS_PRIO  OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
+
+#if OS_EVENT_NAME_EN > 0u
+    INT8U   *OSEventName;
+#endif
 } OS_EVENT;
 #endif
 
-//*********************************************************************************************************
-//事件标志控制块 (EVENT FLAGS CONTROL BLOCK)
-#if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)//当版本为2.51 且 事件标志允许 且最大事件标志大于0时
-typedef struct {                             // 定义一个OS_FLAG_GRP结构                                   
-    INT8U         OSFlagType;                // 用来检验指针的类型是否是指向事件标志组的指针
-    void         *OSFlagWaitList;            // 包含了一个等待事件的任务列表
-    OS_FLAGS      OSFlagFlags;               // 包含了一系列表明当前事件标志状态的位               
-} OS_FLAG_GRP;    							 // 事件标志组
-											      
-typedef struct {                            // 定义一个事件标志等待列表节点(OS_FLAG_NODE)结构
-    void         *OSFlagNodeNext;           // 构建双向OS_FLAG_NODE数据结构链表的后一个链接
-    void         *OSFlagNodePrev;           // 构建双向OS_FLAG_NODE数据结构链表的前一个链接
-    void         *OSFlagNodeTCB;            // 指向某个等待事件标志组中的事件标志任务的控制块
-    void         *OSFlagNodeFlagGrp;        // 是一个反向指回事件标志组的指针 
-    OS_FLAGS      OSFlagNodeFlags;          // 用来指明任务等待事件标志组中的哪些事件标志
-    INT8U         OSFlagNodeWaitType;       // 指明等待事件标志组中的所有事件标志的发生(与、或)
+
+/*
+*********************************************************************************************************
+*                                      EVENT FLAGS CONTROL BLOCK
+*********************************************************************************************************
+*/
+
+#if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+
+#if OS_FLAGS_NBITS == 8u                    /* Determine the size of OS_FLAGS (8, 16 or 32 bits)       */
+typedef  INT8U    OS_FLAGS;
+#endif
+
+#if OS_FLAGS_NBITS == 16u
+typedef  INT16U   OS_FLAGS;
+#endif
+
+#if OS_FLAGS_NBITS == 32u
+typedef  INT32U   OS_FLAGS;
+#endif
+
+
+typedef struct os_flag_grp {                /* Event Flag Group                                        */
+    INT8U         OSFlagType;               /* Should be set to OS_EVENT_TYPE_FLAG                     */
+    void         *OSFlagWaitList;           /* Pointer to first NODE of task waiting on event flag     */
+    OS_FLAGS      OSFlagFlags;              /* 8, 16 or 32 bit flags                                   */
+#if OS_FLAG_NAME_EN > 0u
+    INT8U        *OSFlagName;
+#endif
+} OS_FLAG_GRP;
+
+
+
+typedef struct os_flag_node {               /* Event Flag Wait List Node                               */
+    void         *OSFlagNodeNext;           /* Pointer to next     NODE in wait list                   */
+    void         *OSFlagNodePrev;           /* Pointer to previous NODE in wait list                   */
+    void         *OSFlagNodeTCB;            /* Pointer to TCB of waiting task                          */
+    void         *OSFlagNodeFlagGrp;        /* Pointer to Event Flag Group                             */
+    OS_FLAGS      OSFlagNodeFlags;          /* Event flag to wait on                                   */
+    INT8U         OSFlagNodeWaitType;       /* Type of wait:                                           */
                                             /*      OS_FLAG_WAIT_AND                                   */
                                             /*      OS_FLAG_WAIT_ALL                                   */
                                             /*      OS_FLAG_WAIT_OR                                    */
@@ -209,74 +413,75 @@ typedef struct {                            // 定义一个事件标志等待列
 } OS_FLAG_NODE;
 #endif
 
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                        MESSAGE MAILBOX DATA
+*********************************************************************************************************
+*/
 
-//*********************************************************************************************************
-// 设定一个消息队列的数据结构 (MESSAGE MAILBOX DATA)
-#if OS_MBOX_EN > 0
-typedef struct {						   // 定义一个OS_MBOX_DATA结构
-    void   *OSMsg;                         // 如果消息队列中有消息，它包含指针.OSQOut所指向的队列单元中
-										   // 的内容。如果队列是空的，.OSMsg包含一个NULL指针
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE]; // 消息队列的等待任务列表
-    INT8U   OSEventGrp;                    // 与OSEventTbl[]配合使用
+#if OS_MBOX_EN > 0u
+typedef struct os_mbox_data {
+    void   *OSMsg;                         /* Pointer to message in mailbox                            */
+    OS_PRIO OSEventTbl[OS_EVENT_TBL_SIZE]; /* List of tasks waiting for event to occur                 */
+    OS_PRIO OSEventGrp;                    /* Group corresponding to tasks waiting for event to occur  */
 } OS_MBOX_DATA;
 #endif
 
-//*********************************************************************************************************
-//设定一个内存的数据结构 (MEMORY PARTITION DATA STRUCTURES)
-#if (OS_MEM_EN > 0) && (OS_MAX_MEM_PART > 0)
-typedef struct {                       // 使用内存控制块（memory control blocks）的数据结构来跟踪每一
-									   // 个内存分区，系统中的每个内存分区都有它自己的内存控制块。
-    void   *OSMemAddr;                 // 指向内存分区起始地址的指针
-    void   *OSMemFreeList;             // 指向下一个空闲内存控制块或者下一个空闲的内存块的指针
-    INT32U  OSMemBlkSize;              // 内存分区中内存块的大小，是用户建立该内存分区时指定的
-    INT32U  OSMemNBlks;                // 内存分区中总的内存块数量，也是用户建立该内存分区时指定的
-    INT32U  OSMemNFree;                // 内存分区中当前可以得空闲内存块数量
+/*
+*********************************************************************************************************
+*                                  MEMORY PARTITION DATA STRUCTURES
+*********************************************************************************************************
+*/
+
+#if (OS_MEM_EN > 0u) && (OS_MAX_MEM_PART > 0u)
+typedef struct os_mem {                   /* MEMORY CONTROL BLOCK                                      */
+    void   *OSMemAddr;                    /* Pointer to beginning of memory partition                  */
+    void   *OSMemFreeList;                /* Pointer to list of free memory blocks                     */
+    INT32U  OSMemBlkSize;                 /* Size (in bytes) of each block of memory                   */
+    INT32U  OSMemNBlks;                   /* Total number of blocks in this partition                  */
+    INT32U  OSMemNFree;                   /* Number of memory blocks remaining in this partition       */
+#if OS_MEM_NAME_EN > 0u
+    INT8U  *OSMemName;                    /* Memory partition name                                     */
+#endif
 } OS_MEM;
 
 
-typedef struct {
-    void   *OSAddr;                    // 指向内存区起始地址的指针
-    void   *OSFreeList;                /// 指向空闲内存块列表起始地址的指针
-    INT32U  OSBlkSize;                 // 每个内存块的大小
-    INT32U  OSNBlks;                   // 该内存区的内存块总数
-    INT32U  OSNFree;                   // 空闲的内存块数目
-    INT32U  OSNUsed;                   // 使用的内存块数目
+typedef struct os_mem_data {
+    void   *OSAddr;                    /* Pointer to the beginning address of the memory partition     */
+    void   *OSFreeList;                /* Pointer to the beginning of the free list of memory blocks   */
+    INT32U  OSBlkSize;                 /* Size (in bytes) of each memory block                         */
+    INT32U  OSNBlks;                   /* Total number of blocks in the partition                      */
+    INT32U  OSNFree;                   /* Number of memory blocks free                                 */
+    INT32U  OSNUsed;                   /* Number of memory blocks used                                 */
 } OS_MEM_DATA;
 #endif
 
-//*********************************************************************************************************
-//互斥型信号量数据(MUTUAL EXCLUSION SEMAPHORE DATA)
-#if OS_MUTEX_EN > 0	// 允许(1)或者产生互斥型信号量相关代码
-typedef struct {	// 定义指向类型为(OS_MUTEX_DATA)的数据结构的指针
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
-    INT8U   OSEventGrp;                     // 复制等待mutex的任务列表
-    INT8U   OSValue;                        // 当前mutex的值.1表示可以使用，0表示不能使用
-    INT8U   OSOwnerPrio;                    // 占用mutex任务的优先级
-    INT8U   OSMutexPIP;                     // mutex的优先级继承优先级PIP
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                   MUTUAL EXCLUSION SEMAPHORE DATA
+*********************************************************************************************************
+*/
+
+#if OS_MUTEX_EN > 0u
+typedef struct os_mutex_data {
+    OS_PRIO OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
+    OS_PRIO OSEventGrp;                     /* Group corresponding to tasks waiting for event to occur */
+    BOOLEAN OSValue;                        /* Mutex value (OS_FALSE = used, OS_TRUE = available)      */
+    INT8U   OSOwnerPrio;                    /* Mutex owner's task priority or 0xFF if no owner         */
+    INT8U   OSMutexPCP;                     /* Priority Ceiling Priority or 0xFF if PCP disabled       */
 } OS_MUTEX_DATA;
 #endif
 
-//*********************************************************************************************************
-// 消息队列数据 (MESSAGE QUEUE DATA)
 /*
-队列控制块是一个用于维护消息队列信息的数据结构，它包含了以下的一些域。这里，仍然在各个变量前加入
-一个[.]来表示它们是数据结构中的一个域。
-1).OSQPtr: 在空闲队列控制块中链接所有的队列控制块。一旦建立了消息队列，该域就不再有用了。
-2).OSQStart: 是指向消息队列的指针数组的起始地址的指针。用户应用程序在使用消息队列之前必须先定义该数组
-。
-3).OSQEnd: 是指向消息队列结束单元的下一个地址的指针。该指针使得消息队列构成一个循环的缓冲区。
-4).OSQIn: 是指向消息队列中插入下一条消息的位置的指针。当.OSQIn和.OSQEnd相等时，.OSQIn被调整指向
-消息队列的起始单元。
-5).OSQOut: 是指向消息队列中下一个取出消息的位置的指针。当.OSQOut和.OSQEnd相等时，.OSQOut被调整指
-向消息队列的起始单元。
-6).OSQSize: 是消息队列中总的单元数。该值是在建立消息队列时由用户应用程序决定的。在uC/OS-II中,该值最
-大可以是65,535。
-7).OSQEntries: 是消息队列中当前的消息数量。当消息队列是空的时，该值为0。当消息队列满了以后，该值和
-.OSQSize值一样。 在消息队列刚刚建立时，该值为0。
+*********************************************************************************************************
+*                                         MESSAGE QUEUE DATA
+*********************************************************************************************************
 */
 
-#if OS_Q_EN > 0
-typedef struct os_q {                   // 定义一个OS_Q队列控制块                                    */
+#if OS_Q_EN > 0u
+typedef struct os_q {                   /* QUEUE CONTROL BLOCK                                         */
     struct os_q   *OSQPtr;              /* Link to next queue control block in list of free blocks     */
     void         **OSQStart;            /* Pointer to start of queue data                              */
     void         **OSQEnd;              /* Pointer to end   of queue data                              */
@@ -284,556 +489,903 @@ typedef struct os_q {                   // 定义一个OS_Q队列控制块      
     void         **OSQOut;              /* Pointer to where next message will be extracted from the Q  */
     INT16U         OSQSize;             /* Size of queue (maximum number of entries)                   */
     INT16U         OSQEntries;          /* Current number of entries in the queue                      */
-} OS_Q;								 
+} OS_Q;
 
-typedef struct {						// 定义一个消息队列数据(OS_Q_DATA)结构
-    void          *OSMsg;               // 如果消息队列中有消息，它包含指针
-    INT16U         OSNMsgs;             // 消息队列中的消息数
-    INT16U         OSQSize;             // 消息队列的总的容量                                      */
-    INT8U          OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur         */
-    INT8U          OSEventGrp;          //和OSEventTbl[]一起结合，是消息队列的等待任务列表
+
+typedef struct os_q_data {
+    void          *OSMsg;               /* Pointer to next message to be extracted from queue          */
+    INT16U         OSNMsgs;             /* Number of messages in message queue                         */
+    INT16U         OSQSize;             /* Size of message queue                                       */
+    OS_PRIO        OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur         */
+    OS_PRIO        OSEventGrp;          /* Group corresponding to tasks waiting for event to occur     */
 } OS_Q_DATA;
-#endif
-
-//*********************************************************************************************************
-//信号量数据结构 (SEMAPHORE DATA)
-#if OS_SEM_EN > 0
-typedef struct {						    // 定义一个信号量数据结构(OS_SEM_DATA)
-    INT16U  OSCnt;                          // 定义信号量计数值                                      
-    INT8U   OSEventTbl[OS_EVENT_TBL_SIZE];  // 定义任务等待列表
-    INT8U   OSEventGrp;                     // 定义等待事件的任务组
-} OS_SEM_DATA;
-#endif
-
-//*********************************************************************************************************
-//任务堆栈数据 (TASK STACK DATA)
-#if OS_TASK_CREATE_EXT_EN > 0
-typedef struct {					   // 定义一个堆栈数据结构(OS_STK_DATA)
-    INT32U  OSFree;                    // 堆栈中未使用的字节数
-    INT32U  OSUsed;                    // 堆栈中已使用的字节数                
-} OS_STK_DATA;
-#endif
-
-//*********************************************************************************************************
-//任务控制块 (TASK CONTROL BLOCK)
-typedef struct os_tcb {
-    OS_STK        *OSTCBStkPtr;        //当前TCB的栈顶指针
-
-#if OS_TASK_CREATE_EXT_EN > 0		   //允许生成OSTaskCreateExt()函数
-    void          *OSTCBExtPtr;        //指向用户定义的任务控制块(扩展指针)
-    OS_STK        *OSTCBStkBottom;     //指向指向栈底的指针
-    INT32U         OSTCBStkSize;       //设定堆栈的容量
-    INT16U         OSTCBOpt;           //保存OS_TCB的选择项
-    INT16U         OSTCBId;            //任务ID  (0..65535)             
-#endif
-
-    struct os_tcb *OSTCBNext;          //定义指向TCB的双向链接的后链接
-    struct os_tcb *OSTCBPrev;          //定义指向TCB的双向链接的前链接
-
-#if ((OS_Q_EN > 0) && (OS_MAX_QS > 0)) || (OS_MBOX_EN > 0) || (OS_SEM_EN > 0) || (OS_MUTEX_EN > 0)
-//当以上各种事件允许时
-    OS_EVENT      *OSTCBEventPtr;      //定义指向事件控制块的指针
-#endif
-
-#if ((OS_Q_EN > 0) && (OS_MAX_QS > 0)) || (OS_MBOX_EN > 0)
-//满足以上条件,定义传递给任务的消息指针
-    void          *OSTCBMsg;           /* Message received from OSMboxPost() or OSQPost()              */
-#endif
-
-#if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)
-#if OS_TASK_DEL_EN > 0
-    OS_FLAG_NODE  *OSTCBFlagNode;      ///定义事件标志节点的指针
-#endif    
-    OS_FLAGS       OSTCBFlagsRdy;      //定义运行准备完毕的任务控制块中的任务?
-#endif
-
-    INT16U         OSTCBDly;           //定义允许任务等待时的最多节拍数
-    INT8U          OSTCBStat;          //定义任务的状态字        
-    INT8U          OSTCBPrio;          //定义任务的优先级(0 == highest, 63 == lowest)                 
-
-    INT8U          OSTCBX;             //定义指向任务优先级的低3位，即=priority&0x07
-    INT8U          OSTCBY;             //定义指向任务优先级的高3位，即=priority>>3
-    INT8U          OSTCBBitX;          //定义低3位就绪表对应值（0～7），即＝OSMapTbl[priority&0x07]
-    INT8U          OSTCBBitY;          //定义高3位就绪表对应值（0～7），即＝OSMapTbl[priority>>3]
-
-#if OS_TASK_DEL_EN > 0				   //允许生成 OSTaskDel() 函数代码函数
-    BOOLEAN        OSTCBDelReq;        //定义用于表示该任务是否须删除
-#endif
-} OS_TCB;
-
-//*********************************************************************************************************
-//全局变量 (GLOBAL VARIABLES)
-OS_EXT  INT32U            OSCtxSwCtr;               //上下文切换的次数(统计任务计数器)
-
-#if (OS_EVENT_EN > 0) && (OS_MAX_EVENTS > 0)	    //如果有消息事件，并且最大消息事件数>0
-OS_EXT  OS_EVENT         *OSEventFreeList;          //空余事件管理列表指针
-OS_EXT  OS_EVENT          OSEventTbl[OS_MAX_EVENTS];//事件控制块表
-#endif
-//当满足版本大于2.51且事件标志允许且有最大事件标志
-#if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)
-OS_EXT  OS_FLAG_GRP       OSFlagTbl[OS_MAX_FLAGS];  //定义一个事件标志列表
-OS_EXT  OS_FLAG_GRP      *OSFlagFreeList;           //定义一个空闲的事件标志组
-#endif
-
-#if OS_TASK_STAT_EN > 0							    //定义允许生产OS_TaskStat()函数
-OS_EXT  INT8S             OSCPUUsage;               //定义CPU 使用率                        
-OS_EXT  INT32U            OSIdleCtrMax;             //定义最大空闲计数值
-OS_EXT  INT32U            OSIdleCtrRun;             //定义当前的空闲计数值
-OS_EXT  BOOLEAN           OSStatRdy;                //定义统计任务就绪标志
-OS_EXT  OS_STK            OSTaskStatStk[OS_TASK_STAT_STK_SIZE];/* Statistics task stack          */
-#endif
-
-OS_EXT  INT8U             OSIntNesting;             //定义中断嵌套层数
-OS_EXT  INT8U             OSIntExitY;				//用于函数OSInieExt( )
-
-OS_EXT  INT8U             OSLockNesting;            //定义锁定嵌套计数器
-
-OS_EXT  INT8U             OSPrioCur;                //定义正在运行的任务的优先级
-OS_EXT  INT8U             OSPrioHighRdy;            //定义具有最高优先级别的就绪任务的优先级
-
-OS_EXT  INT8U             OSRdyGrp;                        /* Ready list group                         */
-OS_EXT  INT8U             OSRdyTbl[OS_RDY_TBL_SIZE];       //即将要运行的任务列表
-
-OS_EXT  BOOLEAN           OSRunning;                       //多任务已经开始=1,任务处于不运行状态=0
-
-OS_EXT  INT8U             OSTaskCtr;                       //定义任务计数器
-
-OS_EXT  volatile  INT32U  OSIdleCtr;                        //定义32位空闲任务的计数器
-
-OS_EXT  OS_STK            OSTaskIdleStk[OS_TASK_IDLE_STK_SIZE];//分配空闲任务堆栈栈顶指针
-
-
-OS_EXT  OS_TCB           *OSTCBCur;                        //定义指向正在运行任务控制块的指针
-OS_EXT  OS_TCB           *OSTCBFreeList;                   //定义空任务控制块指针  
-OS_EXT  OS_TCB           *OSTCBHighRdy;                    //定义指向最高级优先级就绪任务控制块的指针
-OS_EXT  OS_TCB           *OSTCBList;                       //定义任务控制块列表首地址
-OS_EXT  OS_TCB           *OSTCBPrioTbl[OS_LOWEST_PRIO + 1];//定义任务控制块优先级表
-OS_EXT  OS_TCB            OSTCBTbl[OS_MAX_TASKS + OS_N_SYS_TASKS];//定义当前任务控制块列表
-
-//条件编译：若两个条件满足时，产生以下代码
-//OS_MEM_EN允许 (1) 或者禁止 (0) 产生内存相关代码
-//OS_MAX_MEM_PART 最多内存块的数目
-#if (OS_MEM_EN > 0) && (OS_MAX_MEM_PART > 0)
-OS_EXT  OS_MEM           *OSMemFreeList;            //空余内存控制块(链接)指针
-OS_EXT  OS_MEM            OSMemTbl[OS_MAX_MEM_PART];/* Storage for memory partition manager            */
-#endif
-
-#if (OS_Q_EN > 0) && (OS_MAX_QS > 0)				//条件编译：OS_Q_EN 允许 (1)产生消息队列相关代码
-//条件编译：应用中最多对列控制块的数目 > 0			
-OS_EXT  OS_Q             *OSQFreeList;              /* Pointer to list of free QUEUE control blocks    */
-OS_EXT  OS_Q              OSQTbl[OS_MAX_QS];        /* Table of QUEUE control blocks                   */
-#endif
-
-#if OS_TIME_GET_SET_EN > 0   					    //允许生成OSTimeGet() 函数代码	 
-OS_EXT  volatile  INT32U  OSTime;                   //当前系统时钟数值(in ticks)        
-#endif
-
-extern  INT8U  const      OSMapTbl[];               /* Priority->Bit Mask lookup table                 */
-extern  INT8U  const      OSUnMapTbl[];             /* Priority->Index    lookup table                 */
-
-//*********************************************************************************************************
-//功能原型 (FUNCTION PROTOTYPES)
-//不受约束的函数 (Target Independent Functions)
-//事件标志管理 (EVENT FLAGS MANAGEMENT)
-//OSFlagAccept() 检查事件标志组函数(标志组的指针、事件标志位、等待事件标志位的方式、错误码指针)
-//OSFlagCreate() 建立一个事件标志组(初值、错误码)
-//OSFlagDel() 删除一个事件标志组(指针、条件值、错误值)
-//OSFlagPend() 等待事件标志组的事件标志位(事件组指针、需要检查的标志位、等待事件标志位的方式、
-//允许等待的时钟节拍、出错代码的时钟节拍)
-//OSFlagPost() 置位或清0事件标志组中的标志位(指针、标志位、条件值、错误码)
-//OSFlagQuery() 查询事件标志组的当前事件标志状态(事件标志组的指针、错误代码的指针)
-
-#if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)
-
-#if OS_FLAG_ACCEPT_EN > 0
-OS_FLAGS      OSFlagAccept(OS_FLAG_GRP *pgrp, OS_FLAGS flags, INT8U wait_type, INT8U *err);
-#endif
-
-OS_FLAG_GRP  *OSFlagCreate(OS_FLAGS flags, INT8U *err);
-
-#if OS_FLAG_DEL_EN > 0
-OS_FLAG_GRP  *OSFlagDel(OS_FLAG_GRP *pgrp, INT8U opt, INT8U *err);
-#endif
-
-OS_FLAGS      OSFlagPend(OS_FLAG_GRP *pgrp, OS_FLAGS flags, INT8U wait_type, INT16U timeout, INT8U *err);
-OS_FLAGS      OSFlagPost(OS_FLAG_GRP *pgrp, OS_FLAGS flags, INT8U operation, INT8U *err);
-
-#if OS_FLAG_QUERY_EN > 0
-OS_FLAGS      OSFlagQuery(OS_FLAG_GRP *pgrp, INT8U *err);
-#endif
-#endif
-
-//*********************************************************************************************************
-//消息邮箱管理 (MESSAGE MAILBOX MANAGEMENT)
-//OSMboxAccept () 查看消息邮箱(消息邮箱指针)
-//OSMboxCreate () 建立并初始化一个消息邮箱(msg 参数不为空含内容)
-//OSMboxDel () 删除消息邮箱(消息邮箱指针、删除条件、出错代码指针)
-//OSMboxPend () 等待一个消息邮箱函数(消息邮箱指针、允许等待的时钟节拍、代码错误指针)
-//OSMboxPost () 发送消息函数(消息邮箱指针、即将实际发送给任务的消息)
-//OSMboxPostOpt () 向邮箱发送一则消息(邮箱指针、消息、条件)
-//OSMboxQuery () 查询一个邮箱的当前状态(信号量指针、状态数据结构指针)
-
-
-#if OS_MBOX_EN > 0
-
-#if OS_MBOX_ACCEPT_EN > 0
-void         *OSMboxAccept(OS_EVENT *pevent);
-#endif
-
-OS_EVENT     *OSMboxCreate(void *msg);
-
-#if OS_MBOX_DEL_EN > 0
-OS_EVENT     *OSMboxDel(OS_EVENT *pevent, INT8U opt, INT8U *err);
-#endif
-
-void         *OSMboxPend(OS_EVENT *pevent, INT16U timeout, INT8U *err);
-
-#if OS_MBOX_POST_EN > 0
-INT8U         OSMboxPost(OS_EVENT *pevent, void *msg);
-#endif
-
-#if OS_MBOX_POST_OPT_EN > 0
-INT8U         OSMboxPostOpt(OS_EVENT *pevent, void *msg, INT8U opt);
-#endif
-
-#if OS_MBOX_QUERY_EN > 0
-INT8U         OSMboxQuery(OS_EVENT *pevent, OS_MBOX_DATA *pdata);
-#endif
-#endif
-
-//*********************************************************************************************************
-//内存管理项 (MEMORY MANAGEMENT)	  
-//OSMemCreate () 建立并初始化一块内存区(起始地址、需要的内存块数目、内存块大小、返回错误的指针)
-//OSMemGet () 从内存区分配一个内存块
-//OSMemPut () 释放一个内存块，内存块必须释放回原先申请的内存区
-//OSMemQuery () 得到内存区的信息
-
-
-#if (OS_MEM_EN > 0) && (OS_MAX_MEM_PART > 0)
-
-OS_MEM       *OSMemCreate(void *addr, INT32U nblks, INT32U blksize, INT8U *err);
-void         *OSMemGet(OS_MEM *pmem, INT8U *err);
-INT8U         OSMemPut(OS_MEM *pmem, void *pblk);
-
-#if OS_MEM_QUERY_EN > 0
-INT8U         OSMemQuery(OS_MEM *pmem, OS_MEM_DATA *pdata);
-#endif
-
-#endif
-
-//*********************************************************************************************************
-//互斥型信号量项管理 (MUTUAL EXCLUSION SEMAPHORE MANAGEMENT) 
-//OSMutexAccept () 无等待地获取互斥型信号量[任务不挂起](信号量指针、错误代码)
-//OSMutexCreate () 建立并初始化一个互斥型信号量(优先级继承优先级(PIP)、出错代码指针)
-//OSMutexDel () 删除互斥型信号量(信号指针、删除条件、错误指针)
-//OSMutexPend () 等待一个互斥型信号量(指针、等待超时时限、出错代码指针)
-//OSMutexPost () 释放一个互斥型信号量(互斥型信号量指针)
-//OSMutexQuery () 查询一个互斥型信号量的当前状态(互斥型信号量指针、状态数据结构指针)
-
-
-#if OS_MUTEX_EN > 0
-
-#if OS_MUTEX_ACCEPT_EN > 0
-INT8U         OSMutexAccept(OS_EVENT *pevent, INT8U *err);
-#endif
-
-OS_EVENT     *OSMutexCreate(INT8U prio, INT8U *err);
-
-#if OS_MUTEX_DEL_EN > 0
-OS_EVENT     *OSMutexDel(OS_EVENT *pevent, INT8U opt, INT8U *err);
-#endif
-
-void          OSMutexPend(OS_EVENT *pevent, INT16U timeout, INT8U *err);
-INT8U         OSMutexPost(OS_EVENT *pevent);
-
-#if OS_MUTEX_QUERY_EN > 0
-INT8U         OSMutexQuery(OS_EVENT *pevent, OS_MUTEX_DATA *pdata);
-#endif
-
-#endif
-
-//*********************************************************************************************************
-//消息队列管理 (MESSAGE QUEUE MANAGEMENT)	  
-//OSQAccept () 检查消息队列中是否已经有需要的消息(消息队列的指针)
-//OSQCreate () 建立一个消息队列(消息内存区的基地址(指针数组)、消息内存区的大小)
-//OSQDel () 删除一个消息队列(消息队列指针、删除条件、错误指针)
-//OSQFlush () 清空消息队列(指向得到消息队列的指针)
-//OSQPend () 任务等待消息队列中的消息(消息队列指针、允许等待的时钟节拍、代码错误指针)
-//OSQPost () 向消息队列发送一则消息FIFO(消息队列指针、发送的消息)
-//OSQPostFront () 向消息队列发送一则消息LIFO(消息队列指针、发送的消息)
-//OSQPostOpt () 向消息队列发送一则消息LIFO(消息队列指针、发送的消息、发送条件)
-//OSQQuery () 查询一个消息队列的当前状态(信号量指针、状态数据结构指针)
-
-#if (OS_Q_EN > 0) && (OS_MAX_QS > 0)
-
-#if OS_Q_ACCEPT_EN > 0
-void         *OSQAccept(OS_EVENT *pevent);
-#endif
-
-OS_EVENT     *OSQCreate(void **start, INT16U size);
-
-#if OS_Q_DEL_EN > 0
-OS_EVENT     *OSQDel(OS_EVENT *pevent, INT8U opt, INT8U *err);
-#endif
-
-#if OS_Q_FLUSH_EN > 0
-INT8U         OSQFlush(OS_EVENT *pevent);
-#endif
-
-void         *OSQPend(OS_EVENT *pevent, INT16U timeout, INT8U *err);
-
-#if OS_Q_POST_EN > 0
-INT8U         OSQPost(OS_EVENT *pevent, void *msg);
-#endif
-
-#if OS_Q_POST_FRONT_EN > 0
-INT8U         OSQPostFront(OS_EVENT *pevent, void *msg);
-#endif
-
-#if OS_Q_POST_OPT_EN > 0
-INT8U         OSQPostOpt(OS_EVENT *pevent, void *msg, INT8U opt);
-#endif
-
-#if OS_Q_QUERY_EN > 0
-INT8U         OSQQuery(OS_EVENT *pevent, OS_Q_DATA *pdata);
-#endif
-
-#endif
-
-//*********************************************************************************************************
-//信号量管理 (SEMAPHORE MANAGEMENT)	    
-//OSSemAccept() 无条件地等待请求一个信号量函数
-//OSSemCreate() 建立并初始化一个信号量(输入一个信号量值)
-//OSSemDel() 删除一个信号量(信号指针、删除条件、错误指针)
-//OSSemPend () 等待一个信号量函数(信号量指针、允许等待的时钟节拍、代码错误指针)
-//OSSemPost () 发出一个信号量函数(信号量指针)
-//OSSemQuery () 查询一个信号量的当前状态(信号量指针、状态数据结构指针)
-
-#if OS_SEM_EN > 0
-
-#if OS_SEM_ACCEPT_EN > 0
-INT16U        OSSemAccept(OS_EVENT *pevent);
-#endif
-
-OS_EVENT     *OSSemCreate(INT16U cnt);
-
-#if OS_SEM_DEL_EN > 0
-OS_EVENT     *OSSemDel(OS_EVENT *pevent, INT8U opt, INT8U *err);
-#endif
-
-void          OSSemPend(OS_EVENT *pevent, INT16U timeout, INT8U *err);
-INT8U         OSSemPost(OS_EVENT *pevent);
-
-#if OS_SEM_QUERY_EN > 0
-INT8U         OSSemQuery(OS_EVENT *pevent, OS_SEM_DATA *pdata);
-#endif
-
-#endif
-	   
-//*********************************************************************************************************
-//任务管理 (TASK MANAGEMENT)    
-//OSTaskChangePrio () 改变一个任务的优先级(任务旧的优先级、任务新的优先级)
-//OSTaskCreate () 建立任务(任务代码指针、传递参数指针、分配任务堆栈栈顶指针、任务优先级)
-//OSTaskCreateExt () 建立扩展任务(任务代码指针/传递参数指针/分配任务堆栈栈顶指针/分配任务优先级
-//(未来的)优先级标识(与优先级相同)/分配任务堆栈栈底指针/指定堆栈的容量(检验用)
-//指向用户附加的数据域的指针/建立任务设定选项)
-//OSTaskDel () 删除任务(任务的优先级)
-//OSTaskDelReq () 请求一个任务删除其它任务或自身?(任务的优先级)
-//OSTaskResume () 唤醒一个用OSTaskSuspend()函数挂起的任务(任务的优先级)
-//OSTaskStkChk () 检查任务堆栈状态(任务优先级、检验堆栈数据结构)
-//OSTaskSuspend () 无条件挂起一个任务(任务优先级)
-//OSTaskQuery () 获取任务信息(任务指针、保存数据结构指针)
-
-#if OS_TASK_CHANGE_PRIO_EN > 0
-INT8U         OSTaskChangePrio(INT8U oldprio, INT8U newprio);
-#endif
-
-#if OS_TASK_CREATE_EN > 0
-INT8U         OSTaskCreate(void (*task)(void *pd), void *pdata, OS_STK *ptos, INT8U prio);
-#endif
-
-#if OS_TASK_CREATE_EXT_EN > 0
-INT8U         OSTaskCreateExt(void  (*task)(void *pd),
-                              void   *pdata,
-                              OS_STK *ptos,
-                              INT8U   prio,
-                              INT16U  id,
-                              OS_STK *pbos,
-                              INT32U  stk_size,
-                              void   *pext,
-                              INT16U  opt);
-#endif
-
-#if OS_TASK_DEL_EN > 0
-INT8U         OSTaskDel(INT8U prio);
-INT8U         OSTaskDelReq(INT8U prio);
-#endif
-
-#if OS_TASK_SUSPEND_EN > 0
-INT8U         OSTaskResume(INT8U prio);
-INT8U         OSTaskSuspend(INT8U prio);
-#endif
-
-#if OS_TASK_CREATE_EXT_EN > 0
-INT8U         OSTaskStkChk(INT8U prio, OS_STK_DATA *pdata);
-#endif
-
-#if OS_TASK_QUERY_EN > 0
-INT8U         OSTaskQuery(INT8U prio, OS_TCB *pdata);
-#endif
-
-//*********************************************************************************************************
-//时钟管理项 (TIME MANAGEMENT)  
-//OSTimeDly () 任务延时函数(时钟节拍数)
-//OSTimeDlyHMSM () 将一个任务延时若干时间(设定时、分、秒、毫秒)
-//OSTimeDlyResume () 唤醒一个用OSTimeDly()或OSTimeDlyHMSM()函数的任务(优先级)
-//OSTimeGet () 获取当前系统时钟数值
-//OSTimeSet () 设置当前系统时钟数值	 
-
-void          OSTimeDly(INT16U ticks);
-
-#if OS_TIME_DLY_HMSM_EN > 0
-INT8U         OSTimeDlyHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U milli);
-#endif
-
-#if OS_TIME_DLY_RESUME_EN > 0
-INT8U         OSTimeDlyResume(INT8U prio);
-#endif
-
-#if OS_TIME_GET_SET_EN > 0
-INT32U        OSTimeGet(void);
-void          OSTimeSet(INT32U ticks);
-#endif
-
-void          OSTimeTick(void);
-
-//*********************************************************************************************************
-//混杂函数定义	 
-//OSInit() 初始化UCOS-II函数
-//OSIntEnter() 中断函数正在执行
-//OSIntExit() 中断函数已经完成(脱离中断)
-//OSSchedLock() 给调度器上锁
-//OSSchedUnlock() 给调度器解锁
-//OSStart() 启动多个任务
-//OSStatInit() 统计任务初始化
-//OSVersion() 获得版本号
-
-void          OSInit(void);
-
-void          OSIntEnter(void);
-void          OSIntExit(void);
-
-#if OS_SCHED_LOCK_EN > 0
-void          OSSchedLock(void);
-void          OSSchedUnlock(void);
-#endif
-
-void          OSStart(void);
-
-void          OSStatInit(void);
-
-INT16U        OSVersion(void);
-
-//*********************************************************************************************************
-//内部函数原型 INTERNAL FUNCTION PROTOTYPES
-//你在应用程序中不能使用它们 (Your application MUST NOT call these functions)
- 
-//OS_Dummy() 建立一个虚拟函数
-//OS_EventTaskRdy() 使一个任务进入就绪态(OS_EVENT *pevent, void *msg, INT8U msk)
-//OS_EventTaskWait() 使一个任务进入等待某事件发生状态(ECB指针)
-//OS_EventTO() 由于超时而将任务置为就绪态(ECB指针)
-//OS_EventWaitListInit()事件控制块列表初始化(事件控制块指针)
-//OS_FlagInit() 初始化事件标志结构
-//OS_FlagUnlink() 把这个OS_FLAG_NODE从事件标志组的等待任务链表中删除(OS_FLAG_NODE *pnode)
-//OS_MemInit() 初始化内存分区
-//OS_QInit() 初始化事件队列结构
-//OS_Sched() 任务调度函数
-//OS_TaskIdle() 空闲任务函数(指向一个数据结构)
-//OS_TaskStat() 统计任务(指向一个数据结构)
-//OS_TCBInit() 初始化任务控制块TCB(优先级指针、栈顶指针、栈底指针、任务标志符、
-//堆栈容量、扩展指针、选择项)
-
-
-#if OS_TASK_DEL_EN > 0
-void          OS_Dummy(void);
-#endif
-
-#if ((OS_Q_EN > 0) && (OS_MAX_QS > 0)) || (OS_MBOX_EN > 0) || (OS_SEM_EN > 0) || (OS_MUTEX_EN > 0)
-INT8U         OS_EventTaskRdy(OS_EVENT *pevent, void *msg, INT8U msk);
-void          OS_EventTaskWait(OS_EVENT *pevent);
-void          OS_EventTO(OS_EVENT *pevent);
-void          OS_EventWaitListInit(OS_EVENT *pevent);
-#endif
-
-#if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)
-void          OS_FlagInit(void);
-void          OS_FlagUnlink(OS_FLAG_NODE *pnode);
-#endif
-
-#if (OS_MEM_EN > 0) && (OS_MAX_MEM_PART > 0)
-void          OS_MemInit(void);
-#endif
-
-#if OS_Q_EN > 0
-void          OS_QInit(void);
-#endif
-
-void          OS_Sched(void);
-
-void          OS_TaskIdle(void *data);
-
-#if OS_TASK_STAT_EN > 0
-void          OS_TaskStat(void *data);
-#endif
-
-INT8U         OS_TCBInit(INT8U prio, OS_STK *ptos, OS_STK *pbos, INT16U id, INT32U stk_size, void *pext, INT16U opt);
-
-//*********************************************************************************************************
-//各类钩子程序函数定义项 (FUNCTION PROTOTYPES)
-//特别钩子函数原型 (Target Specific Functions)
- 
-
-#if OS_VERSION >= 204
-void          OSInitHookBegin(void);
-void          OSInitHookEnd(void);
-#endif
-
-void          OSIntCtxSw(void);
-
-void          OSStartHighRdy(void);
-
-void          OSTaskCreateHook(OS_TCB *ptcb);
-void          OSTaskDelHook(OS_TCB *ptcb);
-
-#if OS_VERSION >= 251
-void          OSTaskIdleHook(void);
-#endif
-
-void          OSTaskStatHook(void);
-OS_STK       *OSTaskStkInit(void (*task)(void *pd), void *pdata, OS_STK *ptos, INT16U opt);
-void          OSTaskSwHook(void);
-
-#if OS_VERSION >= 204
-void          OSTCBInitHook(OS_TCB *ptcb);
-#endif
-
-void          OSTimeTickHook(void);
-
-//*********************************************************************************************************
-//函数原型 FUNCTION PROTOTYPES
-//特殊中断函数原型 (Compiler Specific ISR prototypes)
-
-
-#ifndef OS_ISR_PROTO_EXT
-void          OSCtxSw(void);
-void          OSTickISR(void);
 #endif
 
 /*
 *********************************************************************************************************
+*                                           SEMAPHORE DATA
+*********************************************************************************************************
+*/
+
+#if OS_SEM_EN > 0u
+typedef struct os_sem_data {
+    INT16U  OSCnt;                          /* Semaphore count                                         */
+    OS_PRIO OSEventTbl[OS_EVENT_TBL_SIZE];  /* List of tasks waiting for event to occur                */
+    OS_PRIO OSEventGrp;                     /* Group corresponding to tasks waiting for event to occur */
+} OS_SEM_DATA;
+#endif
+
+/*
+*********************************************************************************************************
+*                                           TASK STACK DATA
+*********************************************************************************************************
+*/
+
+#if OS_TASK_CREATE_EXT_EN > 0u
+typedef struct os_stk_data {
+    INT32U  OSFree;                    /* Number of free entries on the stack                          */
+    INT32U  OSUsed;                    /* Number of entries used on the stack                          */
+} OS_STK_DATA;
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                         TASK CONTROL BLOCK
+*********************************************************************************************************
+*/
+
+typedef struct os_tcb {
+    OS_STK          *OSTCBStkPtr;           /* Pointer to current top of stack                         */
+
+#if OS_TASK_CREATE_EXT_EN > 0u
+    void            *OSTCBExtPtr;           /* Pointer to user definable data for TCB extension        */
+    OS_STK          *OSTCBStkBottom;        /* Pointer to bottom of stack                              */
+    INT32U           OSTCBStkSize;          /* Size of task stack (in number of stack elements)        */
+    INT16U           OSTCBOpt;              /* Task options as passed by OSTaskCreateExt()             */
+    INT16U           OSTCBId;               /* Task ID (0..65535)                                      */
+#endif
+
+    struct os_tcb   *OSTCBNext;             /* Pointer to next     TCB in the TCB list                 */
+    struct os_tcb   *OSTCBPrev;             /* Pointer to previous TCB in the TCB list                 */
+
+#if (OS_EVENT_EN)
+    OS_EVENT        *OSTCBEventPtr;         /* Pointer to          event control block                 */
+#endif
+
+#if (OS_EVENT_EN) && (OS_EVENT_MULTI_EN > 0u)
+    OS_EVENT       **OSTCBEventMultiPtr;    /* Pointer to multiple event control blocks                */
+#endif
+
+#if ((OS_Q_EN > 0u) && (OS_MAX_QS > 0u)) || (OS_MBOX_EN > 0u)
+    void            *OSTCBMsg;              /* Message received from OSMboxPost() or OSQPost()         */
+#endif
+
+#if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+#if OS_TASK_DEL_EN > 0u
+    OS_FLAG_NODE    *OSTCBFlagNode;         /* Pointer to event flag node                              */
+#endif
+    OS_FLAGS         OSTCBFlagsRdy;         /* Event flags that made task ready to run                 */
+#endif
+
+    INT32U           OSTCBDly;              /* Nbr ticks to delay task or, timeout waiting for event   */
+    INT8U            OSTCBStat;             /* Task      status                                        */
+    INT8U            OSTCBStatPend;         /* Task PEND status                                        */
+    INT8U            OSTCBPrio;             /* Task priority (0 == highest)                            */
+
+    INT8U            OSTCBX;                /* Bit position in group  corresponding to task priority   */
+    INT8U            OSTCBY;                /* Index into ready table corresponding to task priority   */
+    OS_PRIO          OSTCBBitX;             /* Bit mask to access bit position in ready table          */
+    OS_PRIO          OSTCBBitY;             /* Bit mask to access bit position in ready group          */
+
+#if OS_TASK_DEL_EN > 0u
+    INT8U            OSTCBDelReq;           /* Indicates whether a task needs to delete itself         */
+#endif
+
+#if OS_TASK_PROFILE_EN > 0u
+    INT32U           OSTCBCtxSwCtr;         /* Number of time the task was switched in                 */
+    INT32U           OSTCBCyclesTot;        /* Total number of clock cycles the task has been running  */
+    INT32U           OSTCBCyclesStart;      /* Snapshot of cycle counter at start of task resumption   */
+    OS_STK          *OSTCBStkBase;          /* Pointer to the beginning of the task stack              */
+    INT32U           OSTCBStkUsed;          /* Number of bytes used from the stack                     */
+#endif
+
+#if OS_TASK_NAME_EN > 0u
+    INT8U           *OSTCBTaskName;
+#endif
+
+#if OS_TASK_REG_TBL_SIZE > 0u
+    INT32U           OSTCBRegTbl[OS_TASK_REG_TBL_SIZE];
+#endif
+} OS_TCB;
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                          TIMER DATA TYPES
+*********************************************************************************************************
+*/
+
+#if OS_TMR_EN > 0u
+typedef  void (*OS_TMR_CALLBACK)(void *ptmr, void *parg);
+
+
+
+typedef  struct  os_tmr {
+    INT8U            OSTmrType;                       /* Should be set to OS_TMR_TYPE                                  */
+    OS_TMR_CALLBACK  OSTmrCallback;                   /* Function to call when timer expires                           */
+    void            *OSTmrCallbackArg;                /* Argument to pass to function when timer expires               */
+    void            *OSTmrNext;                       /* Double link list pointers                                     */
+    void            *OSTmrPrev;
+    INT32U           OSTmrMatch;                      /* Timer expires when OSTmrTime == OSTmrMatch                    */
+    INT32U           OSTmrDly;                        /* Delay time before periodic update starts                      */
+    INT32U           OSTmrPeriod;                     /* Period to repeat timer                                        */
+#if OS_TMR_CFG_NAME_EN > 0u
+    INT8U           *OSTmrName;                       /* Name to give the timer                                        */
+#endif
+    INT8U            OSTmrOpt;                        /* Options (see OS_TMR_OPT_xxx)                                  */
+    INT8U            OSTmrState;                      /* Indicates the state of the timer:                             */
+                                                      /*     OS_TMR_STATE_UNUSED                                       */
+                                                      /*     OS_TMR_STATE_RUNNING                                      */
+                                                      /*     OS_TMR_STATE_STOPPED                                      */
+} OS_TMR;
+
+
+
+typedef  struct  os_tmr_wheel {
+    OS_TMR          *OSTmrFirst;                      /* Pointer to first timer in linked list                         */
+    INT16U           OSTmrEntries;
+} OS_TMR_WHEEL;
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                          GLOBAL VARIABLES
+*********************************************************************************************************
+*/
+
+OS_EXT  INT32U            OSCtxSwCtr;               /* Counter of number of context switches           */
+
+#if (OS_EVENT_EN) && (OS_MAX_EVENTS > 0u)
+OS_EXT  OS_EVENT         *OSEventFreeList;          /* Pointer to list of free EVENT control blocks    */
+OS_EXT  OS_EVENT          OSEventTbl[OS_MAX_EVENTS];/* Table of EVENT control blocks                   */
+#endif
+
+#if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+OS_EXT  OS_FLAG_GRP       OSFlagTbl[OS_MAX_FLAGS];  /* Table containing event flag groups              */
+OS_EXT  OS_FLAG_GRP      *OSFlagFreeList;           /* Pointer to free list of event flag groups       */
+#endif
+
+#if OS_TASK_STAT_EN > 0u
+OS_EXT  INT8U             OSCPUUsage;               /* Percentage of CPU used                          */
+OS_EXT  INT32U            OSIdleCtrMax;             /* Max. value that idle ctr can take in 1 sec.     */
+OS_EXT  INT32U            OSIdleCtrRun;             /* Val. reached by idle ctr at run time in 1 sec.  */
+OS_EXT  BOOLEAN           OSStatRdy;                /* Flag indicating that the statistic task is rdy  */
+OS_EXT  OS_STK            OSTaskStatStk[OS_TASK_STAT_STK_SIZE];      /* Statistics task stack          */
+#endif
+
+OS_EXT  INT8U             OSIntNesting;             /* Interrupt nesting level                         */
+
+OS_EXT  INT8U             OSLockNesting;            /* Multitasking lock nesting level                 */
+
+OS_EXT  INT8U             OSPrioCur;                /* Priority of current task                        */
+OS_EXT  INT8U             OSPrioHighRdy;            /* Priority of highest priority task               */
+
+OS_EXT  OS_PRIO           OSRdyGrp;                        /* Ready list group                         */
+OS_EXT  OS_PRIO           OSRdyTbl[OS_RDY_TBL_SIZE];       /* Table of tasks which are ready to run    */
+
+OS_EXT  BOOLEAN           OSRunning;                       /* Flag indicating that kernel is running   */
+
+OS_EXT  INT8U             OSTaskCtr;                       /* Number of tasks created                  */
+
+OS_EXT  volatile  INT32U  OSIdleCtr;                                 /* Idle counter                   */
+
+#ifdef OS_SAFETY_CRITICAL_IEC61508
+OS_EXT  BOOLEAN           OSSafetyCriticalStartFlag;
+#endif
+
+OS_EXT  OS_STK            OSTaskIdleStk[OS_TASK_IDLE_STK_SIZE];      /* Idle task stack                */
+
+
+OS_EXT  OS_TCB           *OSTCBCur;                        /* Pointer to currently running TCB         */
+OS_EXT  OS_TCB           *OSTCBFreeList;                   /* Pointer to list of free TCBs             */
+OS_EXT  OS_TCB           *OSTCBHighRdy;                    /* Pointer to highest priority TCB R-to-R   */
+OS_EXT  OS_TCB           *OSTCBList;                       /* Pointer to doubly linked list of TCBs    */
+OS_EXT  OS_TCB           *OSTCBPrioTbl[OS_LOWEST_PRIO + 1u];    /* Table of pointers to created TCBs   */
+OS_EXT  OS_TCB            OSTCBTbl[OS_MAX_TASKS + OS_N_SYS_TASKS];   /* Table of TCBs                  */
+
+#if OS_TICK_STEP_EN > 0u
+OS_EXT  INT8U             OSTickStepState;          /* Indicates the state of the tick step feature    */
+#endif
+
+#if (OS_MEM_EN > 0u) && (OS_MAX_MEM_PART > 0u)
+OS_EXT  OS_MEM           *OSMemFreeList;            /* Pointer to free list of memory partitions       */
+OS_EXT  OS_MEM            OSMemTbl[OS_MAX_MEM_PART];/* Storage for memory partition manager            */
+#endif
+
+#if (OS_Q_EN > 0u) && (OS_MAX_QS > 0u)
+OS_EXT  OS_Q             *OSQFreeList;              /* Pointer to list of free QUEUE control blocks    */
+OS_EXT  OS_Q              OSQTbl[OS_MAX_QS];        /* Table of QUEUE control blocks                   */
+#endif
+
+#if OS_TASK_REG_TBL_SIZE > 0u
+OS_EXT  INT8U             OSTaskRegNextAvailID;     /* Next available Task register ID                 */
+#endif
+
+#if OS_TIME_GET_SET_EN > 0u
+OS_EXT  volatile  INT32U  OSTime;                   /* Current value of system time (in ticks)         */
+#endif
+
+#if OS_TMR_EN > 0u
+OS_EXT  INT16U            OSTmrFree;                /* Number of free entries in the timer pool        */
+OS_EXT  INT16U            OSTmrUsed;                /* Number of timers used                           */
+OS_EXT  INT32U            OSTmrTime;                /* Current timer time                              */
+
+OS_EXT  OS_EVENT         *OSTmrSem;                 /* Sem. used to gain exclusive access to timers    */
+OS_EXT  OS_EVENT         *OSTmrSemSignal;           /* Sem. used to signal the update of timers        */
+
+OS_EXT  OS_TMR            OSTmrTbl[OS_TMR_CFG_MAX]; /* Table containing pool of timers                 */
+OS_EXT  OS_TMR           *OSTmrFreeList;            /* Pointer to free list of timers                  */
+OS_EXT  OS_STK            OSTmrTaskStk[OS_TASK_TMR_STK_SIZE];
+
+OS_EXT  OS_TMR_WHEEL      OSTmrWheelTbl[OS_TMR_CFG_WHEEL_SIZE];
+#endif
+
+extern  INT8U   const     OSUnMapTbl[256];          /* Priority->Index    lookup table                 */
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                          FUNCTION PROTOTYPES
+*                                     (Target Independent Functions)
+*********************************************************************************************************
+*/
+
+/*
+*********************************************************************************************************
+*                                            MISCELLANEOUS
+*********************************************************************************************************
+*/
+
+#if (OS_EVENT_EN)
+
+#if (OS_EVENT_NAME_EN > 0u)
+INT8U         OSEventNameGet          (OS_EVENT        *pevent,
+                                       INT8U          **pname,
+                                       INT8U           *perr);
+
+void          OSEventNameSet          (OS_EVENT        *pevent,
+                                       INT8U           *pname,
+                                       INT8U           *perr);
+#endif
+
+#if (OS_EVENT_MULTI_EN > 0u)
+INT16U        OSEventPendMulti        (OS_EVENT       **pevents_pend,
+                                       OS_EVENT       **pevents_rdy,
+                                       void           **pmsgs_rdy,
+                                       INT32U           timeout,
+                                       INT8U           *perr);
+#endif
+
+#endif
+
+/*
+*********************************************************************************************************
+*                                       EVENT FLAGS MANAGEMENT
+*********************************************************************************************************
+*/
+
+#if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+
+#if OS_FLAG_ACCEPT_EN > 0u
+OS_FLAGS      OSFlagAccept            (OS_FLAG_GRP     *pgrp,
+                                       OS_FLAGS         flags,
+                                       INT8U            wait_type,
+                                       INT8U           *perr);
+#endif
+
+OS_FLAG_GRP  *OSFlagCreate            (OS_FLAGS         flags,
+                                       INT8U           *perr);
+
+#if OS_FLAG_DEL_EN > 0u
+OS_FLAG_GRP  *OSFlagDel               (OS_FLAG_GRP     *pgrp,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+#if (OS_FLAG_EN > 0u) && (OS_FLAG_NAME_EN > 0u)
+INT8U         OSFlagNameGet           (OS_FLAG_GRP     *pgrp,
+                                       INT8U          **pname,
+                                       INT8U           *perr);
+
+void          OSFlagNameSet           (OS_FLAG_GRP     *pgrp,
+                                       INT8U           *pname,
+                                       INT8U           *perr);
+#endif
+
+OS_FLAGS      OSFlagPend              (OS_FLAG_GRP     *pgrp,
+                                       OS_FLAGS         flags,
+                                       INT8U            wait_type,
+                                       INT32U           timeout,
+                                       INT8U           *perr);
+
+OS_FLAGS      OSFlagPendGetFlagsRdy   (void);
+OS_FLAGS      OSFlagPost              (OS_FLAG_GRP     *pgrp,
+                                       OS_FLAGS         flags,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+
+#if OS_FLAG_QUERY_EN > 0u
+OS_FLAGS      OSFlagQuery             (OS_FLAG_GRP     *pgrp,
+                                       INT8U           *perr);
+#endif
+#endif
+
+/*
+*********************************************************************************************************
+*                                     MESSAGE MAILBOX MANAGEMENT
+*********************************************************************************************************
+*/
+
+#if OS_MBOX_EN > 0u
+
+#if OS_MBOX_ACCEPT_EN > 0u
+void         *OSMboxAccept            (OS_EVENT        *pevent);
+#endif
+
+OS_EVENT     *OSMboxCreate            (void            *pmsg);
+
+#if OS_MBOX_DEL_EN > 0u
+OS_EVENT     *OSMboxDel               (OS_EVENT        *pevent,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+void         *OSMboxPend              (OS_EVENT        *pevent,
+                                       INT32U           timeout,
+                                       INT8U           *perr);
+
+#if OS_MBOX_PEND_ABORT_EN > 0u
+INT8U         OSMboxPendAbort         (OS_EVENT        *pevent,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+#if OS_MBOX_POST_EN > 0u
+INT8U         OSMboxPost              (OS_EVENT        *pevent,
+                                       void            *pmsg);
+#endif
+
+#if OS_MBOX_POST_OPT_EN > 0u
+INT8U         OSMboxPostOpt           (OS_EVENT        *pevent,
+                                       void            *pmsg,
+                                       INT8U            opt);
+#endif
+
+#if OS_MBOX_QUERY_EN > 0u
+INT8U         OSMboxQuery             (OS_EVENT        *pevent,
+                                       OS_MBOX_DATA    *p_mbox_data);
+#endif
+#endif
+
+/*
+*********************************************************************************************************
+*                                          MEMORY MANAGEMENT
+*********************************************************************************************************
+*/
+
+#if (OS_MEM_EN > 0u) && (OS_MAX_MEM_PART > 0u)
+
+OS_MEM       *OSMemCreate             (void            *addr,
+                                       INT32U           nblks,
+                                       INT32U           blksize,
+                                       INT8U           *perr);
+
+void         *OSMemGet                (OS_MEM          *pmem,
+                                       INT8U           *perr);
+#if OS_MEM_NAME_EN > 0u
+INT8U         OSMemNameGet            (OS_MEM          *pmem,
+                                       INT8U          **pname,
+                                       INT8U           *perr);
+
+void          OSMemNameSet            (OS_MEM          *pmem,
+                                       INT8U           *pname,
+                                       INT8U           *perr);
+#endif
+INT8U         OSMemPut                (OS_MEM          *pmem,
+                                       void            *pblk);
+
+#if OS_MEM_QUERY_EN > 0u
+INT8U         OSMemQuery              (OS_MEM          *pmem,
+                                       OS_MEM_DATA     *p_mem_data);
+#endif
+
+#endif
+
+/*
+*********************************************************************************************************
+*                                MUTUAL EXCLUSION SEMAPHORE MANAGEMENT
+*********************************************************************************************************
+*/
+
+#if OS_MUTEX_EN > 0u
+
+#if OS_MUTEX_ACCEPT_EN > 0u
+BOOLEAN       OSMutexAccept           (OS_EVENT        *pevent,
+                                       INT8U           *perr);
+#endif
+
+OS_EVENT     *OSMutexCreate           (INT8U            prio,
+                                       INT8U           *perr);
+
+#if OS_MUTEX_DEL_EN > 0u
+OS_EVENT     *OSMutexDel              (OS_EVENT        *pevent,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+void          OSMutexPend             (OS_EVENT        *pevent,
+                                       INT32U           timeout,
+                                       INT8U           *perr);
+
+INT8U         OSMutexPost             (OS_EVENT        *pevent);
+
+#if OS_MUTEX_QUERY_EN > 0u
+INT8U         OSMutexQuery            (OS_EVENT        *pevent,
+                                       OS_MUTEX_DATA   *p_mutex_data);
+#endif
+
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                      MESSAGE QUEUE MANAGEMENT
+*********************************************************************************************************
+*/
+
+#if (OS_Q_EN > 0u) && (OS_MAX_QS > 0u)
+
+#if OS_Q_ACCEPT_EN > 0u
+void         *OSQAccept               (OS_EVENT        *pevent,
+                                       INT8U           *perr);
+#endif
+
+OS_EVENT     *OSQCreate               (void           **start,
+                                       INT16U           size);
+
+#if OS_Q_DEL_EN > 0u
+OS_EVENT     *OSQDel                  (OS_EVENT        *pevent,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+#if OS_Q_FLUSH_EN > 0u
+INT8U         OSQFlush                (OS_EVENT        *pevent);
+#endif
+
+void         *OSQPend                 (OS_EVENT        *pevent,
+                                       INT32U           timeout,
+                                       INT8U           *perr);
+
+#if OS_Q_PEND_ABORT_EN > 0u
+INT8U         OSQPendAbort            (OS_EVENT        *pevent,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+#if OS_Q_POST_EN > 0u
+INT8U         OSQPost                 (OS_EVENT        *pevent,
+                                       void            *pmsg);
+#endif
+
+#if OS_Q_POST_FRONT_EN > 0u
+INT8U         OSQPostFront            (OS_EVENT        *pevent,
+                                       void            *pmsg);
+#endif
+
+#if OS_Q_POST_OPT_EN > 0u
+INT8U         OSQPostOpt              (OS_EVENT        *pevent,
+                                       void            *pmsg,
+                                       INT8U            opt);
+#endif
+
+#if OS_Q_QUERY_EN > 0u
+INT8U         OSQQuery                (OS_EVENT        *pevent,
+                                       OS_Q_DATA       *p_q_data);
+#endif
+
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                        SEMAPHORE MANAGEMENT
+*********************************************************************************************************
+*/
+#if OS_SEM_EN > 0u
+
+#if OS_SEM_ACCEPT_EN > 0u
+INT16U        OSSemAccept             (OS_EVENT        *pevent);
+#endif
+
+OS_EVENT     *OSSemCreate             (INT16U           cnt);
+
+#if OS_SEM_DEL_EN > 0u
+OS_EVENT     *OSSemDel                (OS_EVENT        *pevent,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+void          OSSemPend               (OS_EVENT        *pevent,
+                                       INT32U           timeout,
+                                       INT8U           *perr);
+
+#if OS_SEM_PEND_ABORT_EN > 0u
+INT8U         OSSemPendAbort          (OS_EVENT        *pevent,
+                                       INT8U            opt,
+                                       INT8U           *perr);
+#endif
+
+INT8U         OSSemPost               (OS_EVENT        *pevent);
+
+#if OS_SEM_QUERY_EN > 0u
+INT8U         OSSemQuery              (OS_EVENT        *pevent,
+                                       OS_SEM_DATA     *p_sem_data);
+#endif
+
+#if OS_SEM_SET_EN > 0u
+void          OSSemSet                (OS_EVENT        *pevent,
+                                       INT16U           cnt,
+                                       INT8U           *perr);
+#endif
+
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                           TASK MANAGEMENT
+*********************************************************************************************************
+*/
+#if OS_TASK_CHANGE_PRIO_EN > 0u
+INT8U         OSTaskChangePrio        (INT8U            oldprio,
+                                       INT8U            newprio);
+#endif
+
+#if OS_TASK_CREATE_EN > 0u
+INT8U         OSTaskCreate            (void           (*task)(void *p_arg),
+                                       void            *p_arg,
+                                       OS_STK          *ptos,
+                                       INT8U            prio);
+#endif
+
+#if OS_TASK_CREATE_EXT_EN > 0u
+INT8U         OSTaskCreateExt         (void           (*task)(void *p_arg),
+                                       void            *p_arg,
+                                       OS_STK          *ptos,
+                                       INT8U            prio,
+                                       INT16U           id,
+                                       OS_STK          *pbos,
+                                       INT32U           stk_size,
+                                       void            *pext,
+                                       INT16U           opt);
+#endif
+
+#if OS_TASK_DEL_EN > 0u
+INT8U         OSTaskDel               (INT8U            prio);
+INT8U         OSTaskDelReq            (INT8U            prio);
+#endif
+
+#if OS_TASK_NAME_EN > 0u
+INT8U         OSTaskNameGet           (INT8U            prio,
+                                       INT8U          **pname,
+                                       INT8U           *perr);
+
+void          OSTaskNameSet           (INT8U            prio,
+                                       INT8U           *pname,
+                                       INT8U           *perr);
+#endif
+
+#if OS_TASK_SUSPEND_EN > 0u
+INT8U         OSTaskResume            (INT8U            prio);
+INT8U         OSTaskSuspend           (INT8U            prio);
+#endif
+
+#if (OS_TASK_STAT_STK_CHK_EN > 0u) && (OS_TASK_CREATE_EXT_EN > 0u)
+INT8U         OSTaskStkChk            (INT8U            prio,
+                                       OS_STK_DATA     *p_stk_data);
+#endif
+
+#if OS_TASK_QUERY_EN > 0u
+INT8U         OSTaskQuery             (INT8U            prio,
+                                       OS_TCB          *p_task_data);
+#endif
+
+
+
+#if OS_TASK_REG_TBL_SIZE > 0u
+INT32U        OSTaskRegGet            (INT8U            prio,
+                                       INT8U            id,
+                                       INT8U           *perr);
+
+INT8U         OSTaskRegGetID          (INT8U           *perr);
+
+void          OSTaskRegSet            (INT8U            prio,
+                                       INT8U            id,
+                                       INT32U           value,
+                                       INT8U           *perr);
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                           TIME MANAGEMENT
+*********************************************************************************************************
+*/
+
+void          OSTimeDly               (INT32U           ticks);
+
+#if OS_TIME_DLY_HMSM_EN > 0u
+INT8U         OSTimeDlyHMSM           (INT8U            hours,
+                                       INT8U            minutes,
+                                       INT8U            seconds,
+                                       INT16U           ms);
+#endif
+
+#if OS_TIME_DLY_RESUME_EN > 0u
+INT8U         OSTimeDlyResume         (INT8U            prio);
+#endif
+
+#if OS_TIME_GET_SET_EN > 0u
+INT32U        OSTimeGet               (void);
+void          OSTimeSet               (INT32U           ticks);
+#endif
+
+void          OSTimeTick              (void);
+
+/*
+*********************************************************************************************************
+*                                          TIMER MANAGEMENT
+*********************************************************************************************************
+*/
+
+#if OS_TMR_EN > 0u
+OS_TMR      *OSTmrCreate              (INT32U           dly,
+                                       INT32U           period,
+                                       INT8U            opt,
+                                       OS_TMR_CALLBACK  callback,
+                                       void            *callback_arg,
+                                       INT8U           *pname,
+                                       INT8U           *perr);
+
+BOOLEAN      OSTmrDel                 (OS_TMR          *ptmr,
+                                       INT8U           *perr);
+
+#if OS_TMR_CFG_NAME_EN > 0u
+INT8U        OSTmrNameGet             (OS_TMR          *ptmr,
+                                       INT8U          **pdest,
+                                       INT8U           *perr);
+#endif
+INT32U       OSTmrRemainGet           (OS_TMR          *ptmr,
+                                       INT8U           *perr);
+
+INT8U        OSTmrStateGet            (OS_TMR          *ptmr,
+                                       INT8U           *perr);
+
+BOOLEAN      OSTmrStart               (OS_TMR          *ptmr,
+                                       INT8U           *perr);
+
+BOOLEAN      OSTmrStop                (OS_TMR          *ptmr,
+                                       INT8U            opt,
+                                       void            *callback_arg,
+                                       INT8U           *perr);
+
+INT8U        OSTmrSignal              (void);
+#endif
+
+/*
+*********************************************************************************************************
+*                                            MISCELLANEOUS
+*********************************************************************************************************
+*/
+
+void          OSInit                  (void);
+
+void          OSIntEnter              (void);
+void          OSIntExit               (void);
+
+#ifdef OS_SAFETY_CRITICAL_IEC61508
+void          OSSafetyCriticalStart   (void);
+#endif
+
+#if OS_SCHED_LOCK_EN > 0u
+void          OSSchedLock             (void);
+void          OSSchedUnlock           (void);
+#endif
+
+void          OSStart                 (void);
+
+void          OSStatInit              (void);
+
+INT16U        OSVersion               (void);
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                      INTERNAL FUNCTION PROTOTYPES
+*                            (Your application MUST NOT call these functions)
+*********************************************************************************************************
+*/
+
+#if OS_TASK_DEL_EN > 0u
+void          OS_Dummy                (void);
+#endif
+
+#if (OS_EVENT_EN)
+INT8U         OS_EventTaskRdy         (OS_EVENT        *pevent,
+                                       void            *pmsg,
+                                       INT8U            msk,
+                                       INT8U            pend_stat);
+
+void          OS_EventTaskWait        (OS_EVENT        *pevent);
+
+void          OS_EventTaskRemove      (OS_TCB          *ptcb,
+                                       OS_EVENT        *pevent);
+
+#if (OS_EVENT_MULTI_EN > 0u)
+void          OS_EventTaskWaitMulti   (OS_EVENT       **pevents_wait);
+
+void          OS_EventTaskRemoveMulti (OS_TCB          *ptcb,
+                                       OS_EVENT       **pevents_multi);
+#endif
+
+void          OS_EventWaitListInit    (OS_EVENT        *pevent);
+#endif
+
+#if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+void          OS_FlagInit             (void);
+void          OS_FlagUnlink           (OS_FLAG_NODE    *pnode);
+#endif
+
+void          OS_MemClr               (INT8U           *pdest,
+                                       INT16U           size);
+
+void          OS_MemCopy              (INT8U           *pdest,
+                                       INT8U           *psrc,
+                                       INT16U           size);
+
+#if (OS_MEM_EN > 0u) && (OS_MAX_MEM_PART > 0u)
+void          OS_MemInit              (void);
+#endif
+
+#if OS_Q_EN > 0u
+void          OS_QInit                (void);
+#endif
+
+void          OS_Sched                (void);
+
+#if (OS_EVENT_NAME_EN > 0u) || (OS_FLAG_NAME_EN > 0u) || (OS_MEM_NAME_EN > 0u) || (OS_TASK_NAME_EN > 0u)
+INT8U         OS_StrLen               (INT8U           *psrc);
+#endif
+
+void          OS_TaskIdle             (void            *p_arg);
+
+void          OS_TaskReturn           (void);
+
+#if OS_TASK_STAT_EN > 0u
+void          OS_TaskStat             (void            *p_arg);
+#endif
+
+#if (OS_TASK_STAT_STK_CHK_EN > 0u) && (OS_TASK_CREATE_EXT_EN > 0u)
+void          OS_TaskStkClr           (OS_STK          *pbos,
+                                       INT32U           size,
+                                       INT16U           opt);
+#endif
+
+#if (OS_TASK_STAT_STK_CHK_EN > 0u) && (OS_TASK_CREATE_EXT_EN > 0u)
+void          OS_TaskStatStkChk       (void);
+#endif
+
+INT8U         OS_TCBInit              (INT8U            prio,
+                                       OS_STK          *ptos,
+                                       OS_STK          *pbos,
+                                       INT16U           id,
+                                       INT32U           stk_size,
+                                       void            *pext,
+                                       INT16U           opt);
+
+#if OS_TMR_EN > 0u
+void          OSTmr_Init              (void);
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                          FUNCTION PROTOTYPES
+*                                      (Target Specific Functions)
+*********************************************************************************************************
+*/
+
+#if OS_DEBUG_EN > 0u
+void          OSDebugInit             (void);
+#endif
+
+void          OSInitHookBegin         (void);
+void          OSInitHookEnd           (void);
+
+void          OSTaskCreateHook        (OS_TCB          *ptcb);
+void          OSTaskDelHook           (OS_TCB          *ptcb);
+
+void          OSTaskIdleHook          (void);
+
+void          OSTaskReturnHook        (OS_TCB          *ptcb);
+
+void          OSTaskStatHook          (void);
+OS_STK       *OSTaskStkInit           (void           (*task)(void *p_arg),
+                                       void            *p_arg,
+                                       OS_STK          *ptos,
+                                       INT16U           opt);
+
+#if OS_TASK_SW_HOOK_EN > 0u
+void          OSTaskSwHook            (void);
+#endif
+
+void          OSTCBInitHook           (OS_TCB          *ptcb);
+
+#if OS_TIME_TICK_HOOK_EN > 0u
+void          OSTimeTickHook          (void);
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
+*                                          FUNCTION PROTOTYPES
+*                                   (Application Specific Functions)
+*********************************************************************************************************
+*/
+
+#if OS_APP_HOOKS_EN > 0u
+void          App_TaskCreateHook      (OS_TCB          *ptcb);
+void          App_TaskDelHook         (OS_TCB          *ptcb);
+void          App_TaskIdleHook        (void);
+
+void          App_TaskReturnHook      (OS_TCB          *ptcb);
+
+void          App_TaskStatHook        (void);
+
+#if OS_TASK_SW_HOOK_EN > 0u
+void          App_TaskSwHook          (void);
+#endif
+
+void          App_TCBInitHook         (OS_TCB          *ptcb);
+
+#if OS_TIME_TICK_HOOK_EN > 0u
+void          App_TimeTickHook        (void);
+#endif
+#endif
+
+/*
+*********************************************************************************************************
+*                                          FUNCTION PROTOTYPES
+*
+* IMPORTANT: These prototypes MUST be placed in OS_CPU.H
+*********************************************************************************************************
+*/
+
+#if 0
+void          OSStartHighRdy          (void);
+void          OSIntCtxSw              (void);
+void          OSCtxSw                 (void);
+#endif
+
+/*$PAGE*/
+/*
+*********************************************************************************************************
 *                                   LOOK FOR MISSING #define CONSTANTS
 *
-* This section is used to generate ERROR messages at compile time if certain #define constants are 
+* This section is used to generate ERROR messages at compile time if certain #define constants are
 * MISSING in OS_CFG.H.  This allows you to quickly determine the source of the error.
 *
 * You SHOULD NOT change this section UNLESS you would like to add more comments as to the source of the
@@ -841,8 +1393,11 @@ void          OSTickISR(void);
 *********************************************************************************************************
 */
 
-//*********************************************************************************************************
-//事件标志管理条件编译
+/*
+*********************************************************************************************************
+*                                             EVENT FLAGS
+*********************************************************************************************************
+*/
 
 #ifndef OS_FLAG_EN
 #error  "OS_CFG.H, Missing OS_FLAG_EN: Enable (1) or Disable (0) code generation for Event Flags"
@@ -850,12 +1405,13 @@ void          OSTickISR(void);
     #ifndef OS_MAX_FLAGS
     #error  "OS_CFG.H, Missing OS_MAX_FLAGS: Max. number of Event Flag Groups in your application"
     #else
-        #if     OS_MAX_FLAGS == 0
-        #error  "OS_CFG.H, OS_MAX_FLAGS must be > 0"
+        #if     OS_MAX_FLAGS > 65500u
+        #error  "OS_CFG.H, OS_MAX_FLAGS must be <= 65500"
         #endif
-        #if     OS_MAX_FLAGS > 255
-        #error  "OS_CFG.H, OS_MAX_FLAGS must be <= 255"
-        #endif
+    #endif
+
+    #ifndef OS_FLAGS_NBITS
+    #error  "OS_CFG.H, Missing OS_FLAGS_NBITS: Determine #bits used for event flags, MUST be either 8, 16 or 32"
     #endif
 
     #ifndef OS_FLAG_WAIT_CLR_EN
@@ -870,13 +1426,20 @@ void          OSTickISR(void);
     #error  "OS_CFG.H, Missing OS_FLAG_DEL_EN: Include code for OSFlagDel()"
     #endif
 
+    #ifndef OS_FLAG_NAME_EN
+    #error  "OS_CFG.H, Missing OS_FLAG_NAME_EN: Enable flag group names"
+    #endif
+
     #ifndef OS_FLAG_QUERY_EN
     #error  "OS_CFG.H, Missing OS_FLAG_QUERY_EN: Include code for OSFlagQuery()"
     #endif
 #endif
 
-//*********************************************************************************************************
-//消息邮箱管理条件编译
+/*
+*********************************************************************************************************
+*                                          MESSAGE MAILBOXES
+*********************************************************************************************************
+*/
 
 #ifndef OS_MBOX_EN
 #error  "OS_CFG.H, Missing OS_MBOX_EN: Enable (1) or Disable (0) code generation for MAILBOXES"
@@ -887,6 +1450,10 @@ void          OSTickISR(void);
 
     #ifndef OS_MBOX_DEL_EN
     #error  "OS_CFG.H, Missing OS_MBOX_DEL_EN: Include code for OSMboxDel()"
+    #endif
+
+    #ifndef OS_MBOX_PEND_ABORT_EN
+    #error  "OS_CFG.H, Missing OS_MBOX_PEND_ABORT_EN: Include code for OSMboxPendAbort()"
     #endif
 
     #ifndef OS_MBOX_POST_EN
@@ -902,8 +1469,11 @@ void          OSTickISR(void);
     #endif
 #endif
 
-//*********************************************************************************************************
-//内存管理条件编译
+/*
+*********************************************************************************************************
+*                                          MEMORY MANAGEMENT
+*********************************************************************************************************
+*/
 
 #ifndef OS_MEM_EN
 #error  "OS_CFG.H, Missing OS_MEM_EN: Enable (1) or Disable (0) code generation for MEMORY MANAGER"
@@ -911,12 +1481,13 @@ void          OSTickISR(void);
     #ifndef OS_MAX_MEM_PART
     #error  "OS_CFG.H, Missing OS_MAX_MEM_PART: Max. number of memory partitions"
     #else
-        #if     OS_MAX_MEM_PART == 0
-        #error  "OS_CFG.H, OS_MAX_MEM_PART must be > 0"
+        #if     OS_MAX_MEM_PART > 65500u
+        #error  "OS_CFG.H, OS_MAX_MEM_PART must be <= 65500"
         #endif
-        #if     OS_MAX_MEM_PART > 255
-        #error  "OS_CFG.H, OS_MAX_MEM_PART must be <= 255"
-        #endif
+    #endif
+
+    #ifndef OS_MEM_NAME_EN
+    #error  "OS_CFG.H, Missing OS_MEM_NAME_EN: Enable memory partition names"
     #endif
 
     #ifndef OS_MEM_QUERY_EN
@@ -924,8 +1495,11 @@ void          OSTickISR(void);
     #endif
 #endif
 
-//*********************************************************************************************************
-//互斥型信号量管理条件编译
+/*
+*********************************************************************************************************
+*                                     MUTUAL EXCLUSION SEMAPHORES
+*********************************************************************************************************
+*/
 
 #ifndef OS_MUTEX_EN
 #error  "OS_CFG.H, Missing OS_MUTEX_EN: Enable (1) or Disable (0) code generation for MUTEX"
@@ -943,8 +1517,11 @@ void          OSTickISR(void);
     #endif
 #endif
 
-//*********************************************************************************************************
-//消息队列条件编译
+/*
+*********************************************************************************************************
+*                                           MESSAGE QUEUES
+*********************************************************************************************************
+*/
 
 #ifndef OS_Q_EN
 #error  "OS_CFG.H, Missing OS_Q_EN: Enable (1) or Disable (0) code generation for QUEUES"
@@ -952,11 +1529,8 @@ void          OSTickISR(void);
     #ifndef OS_MAX_QS
     #error  "OS_CFG.H, Missing OS_MAX_QS: Max. number of queue control blocks"
     #else
-        #if     OS_MAX_QS == 0
-        #error  "OS_CFG.H, OS_MAX_QS must be > 0"
-        #endif
-        #if     OS_MAX_QS > 255
-        #error  "OS_CFG.H, OS_MAX_QS must be <= 255"
+        #if     OS_MAX_QS > 65500u
+        #error  "OS_CFG.H, OS_MAX_QS must be <= 65500"
         #endif
     #endif
 
@@ -970,6 +1544,10 @@ void          OSTickISR(void);
 
     #ifndef OS_Q_FLUSH_EN
     #error  "OS_CFG.H, Missing OS_Q_FLUSH_EN: Include code for OSQFlush()"
+    #endif
+
+    #ifndef OS_Q_PEND_ABORT_EN
+    #error  "OS_CFG.H, Missing OS_Q_PEND_ABORT_EN: Include code for OSQPendAbort()"
     #endif
 
     #ifndef OS_Q_POST_EN
@@ -989,8 +1567,11 @@ void          OSTickISR(void);
     #endif
 #endif
 
-//*********************************************************************************************************
-//信号量条件编译
+/*
+*********************************************************************************************************
+*                                             SEMAPHORES
+*********************************************************************************************************
+*/
 
 #ifndef OS_SEM_EN
 #error  "OS_CFG.H, Missing OS_SEM_EN: Enable (1) or Disable (0) code generation for SEMAPHORES"
@@ -1003,23 +1584,40 @@ void          OSTickISR(void);
     #error  "OS_CFG.H, Missing OS_SEM_DEL_EN: Include code for OSSemDel()"
     #endif
 
+    #ifndef OS_SEM_PEND_ABORT_EN
+    #error  "OS_CFG.H, Missing OS_SEM_PEND_ABORT_EN: Include code for OSSemPendAbort()"
+    #endif
+
     #ifndef OS_SEM_QUERY_EN
     #error  "OS_CFG.H, Missing OS_SEM_QUERY_EN: Include code for OSSemQuery()"
     #endif
+
+    #ifndef OS_SEM_SET_EN
+    #error  "OS_CFG.H, Missing OS_SEM_SET_EN: Include code for OSSemSet()"
+    #endif
 #endif
 
-//*********************************************************************************************************
-//任务管理条件编译
+/*
+*********************************************************************************************************
+*                                           TASK MANAGEMENT
+*********************************************************************************************************
+*/
 
 #ifndef OS_MAX_TASKS
 #error  "OS_CFG.H, Missing OS_MAX_TASKS: Max. number of tasks in your application"
 #else
-    #if     OS_MAX_TASKS == 0
+    #if     OS_MAX_TASKS < 2u
     #error  "OS_CFG.H,         OS_MAX_TASKS must be >= 2"
     #endif
-    #if     OS_MAX_TASKS > 63
-    #error  "OS_CFG.H,         OS_MAX_TASKS must be <= 63"
+
+    #if     OS_MAX_TASKS >  ((OS_LOWEST_PRIO - OS_N_SYS_TASKS) + 1u)
+    #error  "OS_CFG.H,         OS_MAX_TASKS must be <= OS_LOWEST_PRIO - OS_N_SYS_TASKS + 1"
     #endif
+
+#endif
+
+#if     OS_LOWEST_PRIO >  254u
+#error  "OS_CFG.H,         OS_LOWEST_PRIO must be <= 254 in V2.8x and higher"
 #endif
 
 #ifndef OS_TASK_IDLE_STK_SIZE
@@ -1034,6 +1632,10 @@ void          OSTickISR(void);
 #error  "OS_CFG.H, Missing OS_TASK_STAT_STK_SIZE: Statistics task stack size"
 #endif
 
+#ifndef OS_TASK_STAT_STK_CHK_EN
+#error  "OS_CFG.H, Missing OS_TASK_STAT_STK_CHK_EN: Check task stacks from statistics task"
+#endif
+
 #ifndef OS_TASK_CHANGE_PRIO_EN
 #error  "OS_CFG.H, Missing OS_TASK_CHANGE_PRIO_EN: Include code for OSTaskChangePrio()"
 #endif
@@ -1044,10 +1646,18 @@ void          OSTickISR(void);
 
 #ifndef OS_TASK_CREATE_EXT_EN
 #error  "OS_CFG.H, Missing OS_TASK_CREATE_EXT_EN: Include code for OSTaskCreateExt()"
+#else
+    #if (OS_TASK_CREATE_EXT_EN == 0u) && (OS_TASK_CREATE_EN == 0u)
+    #error  "OS_CFG.H,         OS_TASK_CREATE_EXT_EN or OS_TASK_CREATE_EN must be Enable (1)"
+    #endif
 #endif
 
 #ifndef OS_TASK_DEL_EN
 #error  "OS_CFG.H, Missing OS_TASK_DEL_EN: Include code for OSTaskDel()"
+#endif
+
+#ifndef OS_TASK_NAME_EN
+#error  "OS_CFG.H, Missing OS_TASK_NAME_EN: Enable task names"
 #endif
 
 #ifndef OS_TASK_SUSPEND_EN
@@ -1058,8 +1668,19 @@ void          OSTickISR(void);
 #error  "OS_CFG.H, Missing OS_TASK_QUERY_EN: Include code for OSTaskQuery()"
 #endif
 
-//*********************************************************************************************************
-//时间管理条件编译
+#ifndef OS_TASK_REG_TBL_SIZE
+#error  "OS_CFG.H, Missing OS_TASK_REG_TBL_SIZE: Include code for task specific registers"
+#else
+    #if     OS_TASK_REG_TBL_SIZE > 255u
+    #error  "OS_CFG.H,         OS_TASK_REG_TBL_SIZE must be <= 255"
+    #endif
+#endif
+
+/*
+*********************************************************************************************************
+*                                           TIME MANAGEMENT
+*********************************************************************************************************
+*/
 
 #ifndef OS_TICKS_PER_SEC
 #error  "OS_CFG.H, Missing OS_TICKS_PER_SEC: Sets the number of ticks in one second"
@@ -1077,32 +1698,209 @@ void          OSTickISR(void);
 #error  "OS_CFG.H, Missing OS_TIME_GET_SET_EN: Include code for OSTimeGet() and OSTimeSet()"
 #endif
 
-//*********************************************************************************************************
-//混合管理条件编译
+/*
+*********************************************************************************************************
+*                                          TIMER MANAGEMENT
+*********************************************************************************************************
+*/
 
-#ifndef OS_MAX_EVENTS
-#error  "OS_CFG.H, Missing OS_MAX_EVENTS: Max. number of event control blocks in your application"
-#else
-    #if     OS_MAX_EVENTS == 0
-    #error  "OS_CFG.H, OS_MAX_EVENTS must be > 0"
+#ifndef OS_TMR_EN
+#error  "OS_CFG.H, Missing OS_TMR_EN: When (1) enables code generation for Timer Management"
+#elif   OS_TMR_EN > 0u
+    #if     OS_SEM_EN == 0u
+    #error  "OS_CFG.H, Semaphore management is required (set OS_SEM_EN to 1) when enabling Timer Management."
+    #error  "          Timer management require TWO semaphores."
     #endif
-    #if     OS_MAX_EVENTS > 255
-    #error  "OS_CFG.H, OS_MAX_EVENTS must be <= 255"
+
+    #ifndef OS_TMR_CFG_MAX
+    #error  "OS_CFG.H, Missing OS_TMR_CFG_MAX: Determines the total number of timers in an application (2 .. 65500)"
+    #else
+        #if OS_TMR_CFG_MAX < 2u
+        #error  "OS_CFG.H, OS_TMR_CFG_MAX should be between 2 and 65500"
+        #endif
+
+        #if OS_TMR_CFG_MAX > 65500u
+        #error  "OS_CFG.H, OS_TMR_CFG_MAX should be between 2 and 65500"
+        #endif
+    #endif
+
+    #ifndef OS_TMR_CFG_WHEEL_SIZE
+    #error  "OS_CFG.H, Missing OS_TMR_CFG_WHEEL_SIZE: Sets the size of the timer wheel (1 .. 1023)"
+    #else
+        #if OS_TMR_CFG_WHEEL_SIZE < 2u
+        #error  "OS_CFG.H, OS_TMR_CFG_WHEEL_SIZE should be between 2 and 1024"
+        #endif
+
+        #if OS_TMR_CFG_WHEEL_SIZE > 1024u
+        #error  "OS_CFG.H, OS_TMR_CFG_WHEEL_SIZE should be between 2 and 1024"
+        #endif
+    #endif
+
+    #ifndef OS_TMR_CFG_NAME_EN
+    #error  "OS_CFG.H, Missing OS_TMR_CFG_NAME_EN: Enable Timer names"
+    #endif
+
+    #ifndef OS_TMR_CFG_TICKS_PER_SEC
+    #error  "OS_CFG.H, Missing OS_TMR_CFG_TICKS_PER_SEC: Determines the rate at which the timer management task will run (Hz)"
+    #endif
+
+    #ifndef OS_TASK_TMR_STK_SIZE
+    #error  "OS_CFG.H, Missing OS_TASK_TMR_STK_SIZE: Determines the size of the Timer Task's stack"
     #endif
 #endif
 
-#ifndef OS_LOWEST_PRIO
-#error  "OS_CFG.H, Missing OS_LOWEST_PRIO: Defines the lowest priority that can be assigned"
-#endif
+
+/*
+*********************************************************************************************************
+*                                            MISCELLANEOUS
+*********************************************************************************************************
+*/
 
 #ifndef OS_ARG_CHK_EN
 #error  "OS_CFG.H, Missing OS_ARG_CHK_EN: Enable (1) or Disable (0) argument checking"
 #endif
 
+
 #ifndef OS_CPU_HOOKS_EN
 #error  "OS_CFG.H, Missing OS_CPU_HOOKS_EN: uC/OS-II hooks are found in the processor port files when 1"
 #endif
 
+
+#ifndef OS_APP_HOOKS_EN
+#error  "OS_CFG.H, Missing OS_APP_HOOKS_EN: Application-defined hooks are called from the uC/OS-II hooks"
+#endif
+
+
+#ifndef OS_DEBUG_EN
+#error  "OS_CFG.H, Missing OS_DEBUG_EN: Allows you to include variables for debugging or not"
+#endif
+
+
+#ifndef OS_LOWEST_PRIO
+#error  "OS_CFG.H, Missing OS_LOWEST_PRIO: Defines the lowest priority that can be assigned"
+#endif
+
+
+#ifndef OS_MAX_EVENTS
+#error  "OS_CFG.H, Missing OS_MAX_EVENTS: Max. number of event control blocks in your application"
+#else
+    #if     OS_MAX_EVENTS > 65500u
+    #error  "OS_CFG.H, OS_MAX_EVENTS must be <= 65500"
+    #endif
+#endif
+
+
 #ifndef OS_SCHED_LOCK_EN
 #error  "OS_CFG.H, Missing OS_SCHED_LOCK_EN: Include code for OSSchedLock() and OSSchedUnlock()"
+#endif
+
+
+#ifndef OS_EVENT_MULTI_EN
+#error  "OS_CFG.H, Missing OS_EVENT_MULTI_EN: Include code for OSEventPendMulti()"
+#endif
+
+
+#ifndef OS_TASK_PROFILE_EN
+#error  "OS_CFG.H, Missing OS_TASK_PROFILE_EN: Include data structure for run-time task profiling"
+#endif
+
+
+#ifndef OS_TASK_SW_HOOK_EN
+#error  "OS_CFG.H, Missing OS_TASK_SW_HOOK_EN: Allows you to include the code for OSTaskSwHook() or not"
+#endif
+
+
+#ifndef OS_TICK_STEP_EN
+#error  "OS_CFG.H, Missing OS_TICK_STEP_EN: Allows to 'step' one tick at a time with uC/OS-View"
+#endif
+
+
+#ifndef OS_TIME_TICK_HOOK_EN
+#error  "OS_CFG.H, Missing OS_TIME_TICK_HOOK_EN: Allows you to include the code for OSTimeTickHook() or not"
+#endif
+
+/*
+*********************************************************************************************************
+*                                         SAFETY CRITICAL USE
+*********************************************************************************************************
+*/
+
+#ifdef SAFETY_CRITICAL_RELEASE
+
+#if    OS_ARG_CHK_EN < 1u
+#error "OS_CFG.H, OS_ARG_CHK_EN must be enabled for safety-critical release code"
+#endif
+
+#if    OS_APP_HOOKS_EN > 0u
+#error "OS_CFG.H, OS_APP_HOOKS_EN must be disabled for safety-critical release code"
+#endif
+
+#if    OS_DEBUG_EN > 0u
+#error "OS_CFG.H, OS_DEBUG_EN must be disabled for safety-critical release code"
+#endif
+
+#ifdef CANTATA
+#error "OS_CFG.H, CANTATA must be disabled for safety-critical release code"
+#endif
+
+#ifdef OS_SCHED_LOCK_EN
+#error "OS_CFG.H, OS_SCHED_LOCK_EN must be disabled for safety-critical release code"
+#endif
+
+#ifdef VSC_VALIDATION_MODE
+#error "OS_CFG.H, VSC_VALIDATION_MODE must be disabled for safety-critical release code"
+#endif
+
+#if    OS_TASK_STAT_EN > 0u
+#error "OS_CFG.H, OS_TASK_STAT_EN must be disabled for safety-critical release code"
+#endif
+
+#if    OS_TICK_STEP_EN > 0u
+#error "OS_CFG.H, OS_TICK_STEP_EN must be disabled for safety-critical release code"
+#endif
+
+#if    OS_FLAG_EN > 0u
+    #if    OS_FLAG_DEL_EN > 0
+    #error "OS_CFG.H, OS_FLAG_DEL_EN must be disabled for safety-critical release code"
+    #endif
+#endif
+
+#if    OS_MBOX_EN > 0u
+    #if    OS_MBOX_DEL_EN > 0u
+    #error "OS_CFG.H, OS_MBOX_DEL_EN must be disabled for safety-critical release code"
+    #endif
+#endif
+
+#if    OS_MUTEX_EN > 0u
+    #if    OS_MUTEX_DEL_EN > 0u
+    #error "OS_CFG.H, OS_MUTEX_DEL_EN must be disabled for safety-critical release code"
+    #endif
+#endif
+
+#if    OS_Q_EN > 0u
+    #if    OS_Q_DEL_EN > 0u
+    #error "OS_CFG.H, OS_Q_DEL_EN must be disabled for safety-critical release code"
+    #endif
+#endif
+
+#if    OS_SEM_EN > 0u
+    #if    OS_SEM_DEL_EN > 0u
+    #error "OS_CFG.H, OS_SEM_DEL_EN must be disabled for safety-critical release code"
+    #endif
+#endif
+
+#if    OS_TASK_DEL_EN > 0u
+#error "OS_CFG.H, OS_TASK_DEL_EN must be disabled for safety-critical release code"
+#endif
+
+#if    OS_CRITICAL_METHOD != 3u
+#error "OS_CPU.H, OS_CRITICAL_METHOD must be type 3 for safety-critical release code"
+#endif
+
+#endif  /* ------------------------ SAFETY_CRITICAL_RELEASE ------------------------ */
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

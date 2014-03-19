@@ -43,6 +43,22 @@ void DMA_Config(DMA_ControlDat * ControlDat,Uint16 DMAMask )
         DMA_InitStructure.DMA_M2M                = DMA_M2M_Enable;                     //存储器到存储器模式
         DMA_Init(DMA1_Channel1,&DMA_InitStructure);
     }
+    if(ReadMask(DMAMask,EN_DMA_LCD_CLR) == EN_DMA_LCD_DAT) {
+        
+        DMA_DeInit(DMA1_Channel1);
+        DMA_InitStructure.DMA_PeripheralBaseAddr = ControlDat->DMA_PeripheralBaseAddr; //外设地址
+        DMA_InitStructure.DMA_MemoryBaseAddr     = ControlDat->DMA_MemoryBaseAddr;     //存储器地址               
+        DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;          //外设地址增量模式
+        DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;               //存储器地址增量模式
+        DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;    //外设数据宽度
+        DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord;        //存储器数据宽度
+        DMA_InitStructure.DMA_BufferSize         = ControlDat->DMA_BufferSize;         //数据传输数量
+        DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralDST;              //数据传输方向 0：从外设读 1：从存储器读
+        DMA_InitStructure.DMA_Mode               = DMA_Mode_Circular;                  //循环模式
+        DMA_InitStructure.DMA_Priority           = DMA_Priority_High;                  //通道优先级
+        DMA_InitStructure.DMA_M2M                = DMA_M2M_Enable;                     //存储器到存储器模式
+        DMA_Init(DMA1_Channel1,&DMA_InitStructure);
+    }
     if(ReadMask(DMAMask,EN_DMA_SPI1) == EN_DMA_SPI1){
         DMA_DeInit(DMA1_Channel2);
         DMA_InitStructure.DMA_PeripheralBaseAddr = ControlDat->DMA_PeripheralBaseAddr; //外设地址

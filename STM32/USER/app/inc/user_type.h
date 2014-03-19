@@ -83,7 +83,9 @@ typedef struct
     Uint32 DMA_PeripheralBaseAddr;    //外设地址
     Uint32 DMA_MemoryBaseAddr;        //存储器地址 
     Uint32 DMA_BufferSize;            //数据传输数量
-    Uint16 DMA_Mode;
+    Uint16 DMA_InterruptCnt;          //DMA中断次数
+    Uint16 DMA_InterruptMax;          //DMA允许中断最大次数
+    Uint16 DMA_Mode;                  
 }DMA_ControlDat;
 
 
