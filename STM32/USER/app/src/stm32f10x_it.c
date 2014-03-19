@@ -74,29 +74,11 @@ void SVC_Handler(void)
 void DebugMon_Handler(void)
 {
 }
-#ifndef USER_UCOSII
-void DMA1_Channel1_IRQHandler(void)
-{
-#if (LCD_DMA_CLR_EN > 0) || (LCD_DMA_DAT_EN > 0)
-    switch(LcdDmaDat.DMA_Mode){
-        case EN_DMA_LCD_CLR :
-            LcdDmaDat.DMA_InterruptCnt ++;
-            if(LcdDmaDat.DMA_InterruptCnt > LcdDmaDat.DMA_InterruptMax){
-                DMA_ChannelCmd(EN_DMA_LCD_CLR,DISABLE);
-            }
-            break;
-        case EN_DMA_LCD_DAT :
-            break;
-        default : break;
-    }
-    DMA_ClearITPendingBit(DMA1_IT_TC1);    
-#endif    
-}
-#else
+
 void DMA1_Channel1_IRQHandler(void)
 {
     OSIntEnter();
-#if (LCD_DMA_CLR_EN > 0) || (LCD_DMA_DAT_EN > 0)
+
     switch(LcdDmaDat.DMA_Mode){
         case EN_DMA_LCD_CLR :
             LcdDmaDat.DMA_InterruptCnt ++;
@@ -109,22 +91,22 @@ void DMA1_Channel1_IRQHandler(void)
         default : break;
     }
     DMA_ClearITPendingBit(DMA1_IT_TC1);    
-#endif    
+ 
     OSIntExit();
 }
-#endif
-extern Uint8 flag;
+
+
+
 void DMA1_Channel4_IRQHandler(void)
 {
+    OSIntEnter();
     if(DMA_GetITStatus(DMA1_FLAG_TC4)){
-     flag = 1;   
-        
-        
-        
-//        DMA_Cmd(DMA1_Channel4,DISABLE);
-//        DMA_Cmd(DMA1_Channel5,DISABLE);
+        OSSemPost(DMAC4OverSemp);          //发送通道4完成信号
+        DMA_Cmd(DMA1_Channel4,DISABLE);
+        DMA_Cmd(DMA1_Channel5,DISABLE);
     }
 	DMA_ClearITPendingBit(DMA1_FLAG_GL4 | DMA1_FLAG_TC4 | DMA1_FLAG_HT4 | DMA1_FLAG_TE4);
+    OSIntExit();
 }
  
 /*

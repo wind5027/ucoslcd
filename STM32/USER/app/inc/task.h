@@ -11,29 +11,31 @@
 */
 #ifndef TASK_H
 #define TASK_H
+#include "user_cfg.h"
 
 /***************************************************
 任务堆栈大小
 ****************************************************/
 #define START_STK_SIZE   64
-#define LED_STK_SIZE     64
 #define RTC_STK_SIZE     64
-
+#define LCD_STK_SIZE     64
 
 
 /***************************************************
 设置任务优先级
 ****************************************************/
-#define LED0_TASK_Prio      6
-#define LED1_TASK_Prio      7
-#define LED2_TASK_Prio      8
-#define RTC_TASK_Prio       9
-
-
-#define START_TASK_Prio     3
+#define START_TASK_PRIO     5
+#define RTC_TASK_PRIO       7
+#define LCD_TASK_PRIO       8
 
 
 
+
+
+/***************************************************
+任务堆栈
+****************************************************/
+extern OS_STK  TASK_START_STK[START_STK_SIZE];
 
 extern void TaskStart(void *pdata);
 

@@ -64,7 +64,6 @@ void SysInit(void)
     LCD_Init();
     RTC_Prepare();
     
-    LCD_SetBkgrdSpiOfDma(0);
 //    while(1);
     
     SysTickConfig();                          //ucos系统时钟配置
