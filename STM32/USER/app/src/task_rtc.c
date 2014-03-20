@@ -61,7 +61,7 @@ void TaskRTCUpdate(void *pdata)
             MEM_Set((Uint8 *)CurrentTime,0,PARTITION_LENGTH);        //内存清零
             err = OSMemPut(MEMPointer,CurrentTime);                  //释放内存            
         }
-        OSTimeDlyHMSM(0,0,0,500); 
+        OSTimeDlyHMSM(0,0,0,100); 
     }
 }
 

@@ -24,6 +24,7 @@
 #define  EN_GPIO_SPI2       ((Uint16)0x0004)
 #define  EN_GPIO_USART1     ((Uint16)0x0010)
 #define  EN_GPIO_USB        ((Uint16)0x0020)
+#define  EN_GPIO_ADC1       ((Uint16)0x0040)
 #define  EN_GPIO_I2C2       ((Uint16)0x0100)
 #define  EN_GPIO_FSMC       ((Uint16)0x0200)
 #define  EN_GPIO_LED        ((Uint16)0x0400)
@@ -60,8 +61,22 @@
         GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3    \
       | GPIO_Pin_4  | GPIO_Pin_5
 
+/**************************************************
+说明：ADC1端口相关
+**************************************************/
+#define RCC_ADC1_PORT   RCC_APB2Periph_GPIOA
+#define ADC1_PORT       GPIOA
 
-           
+#define  ADC1_PIN     GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3  \
+                    | GPIO_Pin_4  | GPIO_Pin_5  | GPIO_Pin_6  | GPIO_Pin_7 
+
+
+
+
+
+
+
+
 
 /**************************************************
 说明：KEY端口相关

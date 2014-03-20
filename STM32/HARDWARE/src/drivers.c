@@ -19,6 +19,7 @@
 #include "dma_cfg.c"
 #include "rtc_cfg.c"
 #include "spi_cfg.c"
+#include "adc_cfg.c"
 
 #include "lcd_tft.c"
 #include "spi_devices.c"

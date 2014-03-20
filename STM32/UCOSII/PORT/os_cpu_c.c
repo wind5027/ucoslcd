@@ -1,4 +1,4 @@
-﻿/************************ (C) COPYLEFT 2010 Leafgrass *************************
+/************************ (C) COPYLEFT 2010 Leafgrass *************************
 
 * File Name		: os_cpu_c.c 
 * Author		: Librae 
@@ -206,6 +206,7 @@ void OSTCBInitHook (OS_TCB *ptcb)
 */
 void OSTimeTickHook (void)
 {
+    //调用看门狗
 }
 
 

@@ -166,7 +166,10 @@ void LCD_SetCursorXY(Uint16 XDat,Uint16 YDat)
     LCD_WriteDat(YDat & 0x00ff);
     LCD_WriteDat(TFT_7inch_YSize >> 8);
     LCD_WriteDat(TFT_7inch_YSize & 0x00ff);
+    
+    LCD_WriteCmd(LCD_WRITE_MEM_START);       //开始写LCD内存命令
 }
+
 
 /*
 *************************************************************************************
@@ -672,35 +675,24 @@ void LCD_Init(void)
 
 /*
 *************************************************************************************
-* 名    称：void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
+* 名    称：void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr,DMA_ControlDat * ControlDat)
 * 功    能：LCD通过dma方式从spi flash读取 背景
 * 入口参数：Uint32 FlashAddr 背景图片在flash的地址
+            DMA_ControlDat * ControlDat DMA 控制数据指针
 * 出口参数：无
 *************************************************************************************
 */
-Uint16 TFT_Buffer_RX[1024];		
-Uint8 TFT_Buffer_TX;
-Uint8 flag = 0;
-void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
-{
-    DMA_ControlDat  ControlDat;
-   
-    ControlDat.DMA_PeripheralBaseAddr = 0x4000380c;        //SPI2->DR  外设地址
-    ControlDat.DMA_MemoryBaseAddr     = (Uint32)TFT_Buffer_RX;      //存储器地址
-    ControlDat.DMA_BufferSize         = 800;               //TFT 像素
-    
-    DMA_Config(&ControlDat,EN_DMA_SPI2);                   //配置DMA
+void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr,DMA_ControlDat * ControlDat)
+{   
+    DMA_Config(ControlDat,EN_DMA_SPI2);                   //配置DMA
     
     FlashEnable();                                         // Clr CS
-    SPI_FLASH_SendAddr(FlashAddr,MEM_READ);                //Send CMD and Address
-    
-    
-
-    LCD_SetCursorXY(0,0);                                  //设置光标
-    LCD_WriteCmd(LCD_WRITE_MEM_START);                     //开始写LCD内存命令 
+    SPI_FLASH_SendAddr(FlashAddr,MEM_READ);                //Send CMD and Address     
 
     DMA_ChannelCmd(EN_DMA_SPI2,ENABLE);                    //开始DMA传输
 }
+
+
 
 
 

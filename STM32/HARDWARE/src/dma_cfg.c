@@ -23,13 +23,13 @@
 void DMA_Config(DMA_ControlDat * ControlDat,Uint16 DMAMask )
 {
     DMA_InitTypeDef DMA_InitStructure;
-    Uint16 Tmp;
+    Uint16 Tmp = 0x8001;
     
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
     
     if(ReadMask(DMAMask,EN_DMA_LCD_CLR) == EN_DMA_LCD_CLR) {
         
-        DMA_DeInit(DMA1_Channel1);
+        DMA_DeInit(DMA1_Channel6);
         DMA_InitStructure.DMA_PeripheralBaseAddr = ControlDat->DMA_PeripheralBaseAddr; //外设地址
         DMA_InitStructure.DMA_MemoryBaseAddr     = ControlDat->DMA_MemoryBaseAddr;     //存储器地址               
         DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;          //外设地址增量模式
@@ -41,11 +41,11 @@ void DMA_Config(DMA_ControlDat * ControlDat,Uint16 DMAMask )
         DMA_InitStructure.DMA_Mode               = DMA_Mode_Circular;                  //循环模式
         DMA_InitStructure.DMA_Priority           = DMA_Priority_High;                  //通道优先级
         DMA_InitStructure.DMA_M2M                = DMA_M2M_Enable;                     //存储器到存储器模式
-        DMA_Init(DMA1_Channel1,&DMA_InitStructure);
+        DMA_Init(DMA1_Channel6,&DMA_InitStructure);
     }
-    if(ReadMask(DMAMask,EN_DMA_LCD_CLR) == EN_DMA_LCD_DAT) {
+    if(ReadMask(DMAMask,EN_DMA_LCD_DAT) == EN_DMA_LCD_DAT) {
         
-        DMA_DeInit(DMA1_Channel1);
+        DMA_DeInit(DMA1_Channel6);
         DMA_InitStructure.DMA_PeripheralBaseAddr = ControlDat->DMA_PeripheralBaseAddr; //外设地址
         DMA_InitStructure.DMA_MemoryBaseAddr     = ControlDat->DMA_MemoryBaseAddr;     //存储器地址               
         DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;          //外设地址增量模式
@@ -54,10 +54,26 @@ void DMA_Config(DMA_ControlDat * ControlDat,Uint16 DMAMask )
         DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord;        //存储器数据宽度
         DMA_InitStructure.DMA_BufferSize         = ControlDat->DMA_BufferSize;         //数据传输数量
         DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralDST;              //数据传输方向 0：从外设读 1：从存储器读
-        DMA_InitStructure.DMA_Mode               = DMA_Mode_Circular;                  //循环模式
+        DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;                    //循环模式
         DMA_InitStructure.DMA_Priority           = DMA_Priority_High;                  //通道优先级
         DMA_InitStructure.DMA_M2M                = DMA_M2M_Enable;                     //存储器到存储器模式
-        DMA_Init(DMA1_Channel1,&DMA_InitStructure);
+        DMA_Init(DMA1_Channel6,&DMA_InitStructure);
+    }
+    if(ReadMask(DMAMask,EN_DMA_ADC1) == EN_DMA_ADC1) {
+        
+        DMA_DeInit(DMA1_Channel6);
+        DMA_InitStructure.DMA_PeripheralBaseAddr = ControlDat->DMA_PeripheralBaseAddr; //外设地址
+        DMA_InitStructure.DMA_MemoryBaseAddr     = ControlDat->DMA_MemoryBaseAddr;     //存储器地址               
+        DMA_InitStructure.DMA_PeripheralInc      = DMA_PeripheralInc_Disable;          //外设地址增量模式
+        DMA_InitStructure.DMA_MemoryInc          = DMA_MemoryInc_Enable;               //存储器地址增量模式
+        DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;    //外设数据宽度
+        DMA_InitStructure.DMA_MemoryDataSize     = DMA_MemoryDataSize_HalfWord;        //存储器数据宽度
+        DMA_InitStructure.DMA_BufferSize         = ControlDat->DMA_BufferSize;         //数据传输数量
+        DMA_InitStructure.DMA_DIR                = DMA_DIR_PeripheralDST;              //数据传输方向 0：从外设读 1：从存储器读
+        DMA_InitStructure.DMA_Mode               = DMA_Mode_Normal;                    //循环模式
+        DMA_InitStructure.DMA_Priority           = DMA_Priority_High;                  //通道优先级
+        DMA_InitStructure.DMA_M2M                = DMA_M2M_Enable;                     //存储器到存储器模式
+        DMA_Init(DMA1_Channel6,&DMA_InitStructure);
     }
     if(ReadMask(DMAMask,EN_DMA_SPI1) == EN_DMA_SPI1){
         DMA_DeInit(DMA1_Channel2);
@@ -138,11 +154,13 @@ void DMA_ChannelCmd(Uint16 DMAMask ,FunctionalState NewState)
 {
     NVIC_InitTypeDef NVIC_InitStructure;
     
-    if(ReadMask(DMAMask,EN_DMA_LCD_CLR) == EN_DMA_LCD_CLR) {
-        DMA_ClearFlag(DMA1_FLAG_GL1|DMA1_FLAG_TC1|DMA1_FLAG_HT1|DMA1_FLAG_TE1);
-        DMA_Cmd(DMA1_Channel1,NewState);
-        DMA_ITConfig(DMA1_Channel1,DMA_IT_TC,NewState);
+    if((ReadMask(DMAMask,EN_DMA_LCD_CLR) == EN_DMA_LCD_CLR) || 
+       (ReadMask(DMAMask,EN_DMA_LCD_DAT) == EN_DMA_LCD_DAT)) {       
+        DMA_ClearFlag(DMA1_FLAG_GL6|DMA1_FLAG_TC6|DMA1_FLAG_HT6|DMA1_FLAG_TE6);
+//      DMA_ITConfig(DMA1_Channel1,DMA_IT_TC,NewState);
+        DMA_Cmd(DMA1_Channel6,NewState);
     }
+    
     if(ReadMask(DMAMask,EN_DMA_SPI1) == EN_DMA_SPI1){
         DMA_ClearFlag(DMA1_FLAG_GL3|DMA1_FLAG_TC3|DMA1_FLAG_HT3|DMA1_FLAG_TE3);
         DMA_Cmd(DMA1_Channel2,NewState);
@@ -163,11 +181,7 @@ void DMA_ChannelCmd(Uint16 DMAMask ,FunctionalState NewState)
         DMA_ITConfig(DMA1_Channel4,DMA_IT_TC,ENABLE);
         
         DMA_Cmd(DMA1_Channel4,NewState);
-        DMA_Cmd(DMA1_Channel5,NewState);
-  
-//        SPI_I2S_ReceiveData(SPI2);   
-//        while(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_TXE) == 0);  
-   
+        DMA_Cmd(DMA1_Channel5,NewState);  
     }
 }
 

@@ -424,13 +424,14 @@ extern Uint8 LCD_DrawChart(ChartDat *Disp);
 
 /*
 *************************************************************************************
-* 名    称：void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr)
+* 名    称：void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr,DMA_ControlDat * ControlDat)
 * 功    能：LCD通过dma方式从spi flash读取 背景
 * 入口参数：Uint32 FlashAddr 背景图片在flash的地址
+            DMA_ControlDat * ControlDat DMA 控制数据指针
 * 出口参数：无
 *************************************************************************************
 */
-extern void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr);
+extern void LCD_SetBkgrdSpiOfDma(Uint32 FlashAddr,DMA_ControlDat * ControlDat);
 
 
 

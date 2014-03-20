@@ -90,7 +90,7 @@ void DMA1_Channel1_IRQHandler(void)
             break;
         default : break;
     }
-    DMA_ClearITPendingBit(DMA1_IT_TC1);    
+    DMA_ClearITPendingBit(DMA1_FLAG_GL1 | DMA1_FLAG_TC1 | DMA1_FLAG_HT1 | DMA1_FLAG_TE1);    
  
     OSIntExit();
 }

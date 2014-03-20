@@ -63,10 +63,7 @@ void SysInit(void)
     SPI2_Config();                            //SPI2初始化
     LCD_Init();
     RTC_Prepare();
-    
-//    while(1);
-    
+   
     SysTickConfig();                          //ucos系统时钟配置
-
 }
 

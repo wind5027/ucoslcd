@@ -43,6 +43,16 @@ void GPIO_Config(Uint16 GPIOMask , Uint16 FMask)
         GPIO_InitStructure.GPIO_Pin   = GPIOG_FSMC_PIN;
         GPIO_Init(GPIOG,&GPIO_InitStructure);
     }
+    if(ReadMask(GPIOMask,EN_GPIO_ADC1) == EN_GPIO_ADC1){    //ADC1引脚配置
+        
+        RCC_APB2PeriphClockCmd(RCC_ADC1_PORT , ENABLE);      //开启ADC1端口时钟
+        
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AIN;       //ADC1为模拟输入管脚     
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+        GPIO_InitStructure.GPIO_Pin   = ADC1_PIN;
+        GPIO_Init(ADC1_PORT,&GPIO_InitStructure);
+    }
     if(ReadMask(GPIOMask,EN_GPIO_KEY) == EN_GPIO_KEY){
         RCC_APB2PeriphClockCmd(RCC_KEY_PORT , ENABLE);      //开启KEY端口时钟
         
