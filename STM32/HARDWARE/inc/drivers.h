@@ -18,6 +18,7 @@
 #include "dma_cfg.h"
 #include "rtc_cfg.h"
 #include "spi_cfg.h"
+#include "adc_cfg.h"
 
 #include "lcd_tft.h"
 

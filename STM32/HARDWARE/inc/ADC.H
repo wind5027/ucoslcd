@@ -3,7 +3,7 @@
 #include "stm32f10x.h"
 
 #define ADC1_DR_Address ((u32)0x40012400+0x4c);
-extern __IO u16 ADC1_ConvertValue[6];
+extern  u16 ADC1_ConvertValue[6];
 
 void ADC_GPIO_Config(void);
 void ADC_DMA_Config(void);

@@ -1,11 +1,11 @@
 /*
 *************************************************************************************
 **文件说明：LCD操作任务
-**文件名称：task.c 
-**创建日期：2013.11.07  
+**文件名称：task_lcd.c 
+**创建日期：2014.03.20  
 **创 建 人：王玮
 **-----------------------------------------------------------------------------------
-**修改日期：2013.xx.xx
+**修改日期：2014.xx.xx
 **修改说明：
 *************************************************************************************
 */
@@ -16,7 +16,8 @@
 #include "lcd_tft.h"
 #include "memory.h"
 
-Uint8 * BuffAddr[2];DMA_ControlDat  ControlDat;
+Uint8 * BuffAddr[2];
+DMA_ControlDat  ControlDat;
 
 /***************************************************
 说明：LCD背景更新任务
@@ -38,7 +39,7 @@ void TaskLCDBrgUpdate(void *pdata)
             LCD_SetCursorXY(0,0);               //设置光标起点 准备写数据          
 
             while(cnt < 800 * 480 * 2 / PARTITION_LENGTH){ //计算满屏数据搬运次数
-                ControlDat.DMA_PeripheralBaseAddr = 0x4000380c;                    //SPI2->DR  外设地址
+                ControlDat.DMA_PeripheralBaseAddr = (Uint32)&SPI2->DR;             //SPI2->DR  外设地址
                 ControlDat.DMA_MemoryBaseAddr     = (Uint32)BuffAddr[cnt & 0x01];  //存储器地址
                 ControlDat.DMA_BufferSize         = PARTITION_LENGTH;              //DMA传输长度
                 LCD_SetBkgrdSpiOfDma((Uint32)cnt * PARTITION_LENGTH,&ControlDat);       
@@ -61,7 +62,25 @@ void TaskLCDBrgUpdate(void *pdata)
             err1 = OSMemPut(MEMPointer,BuffAddr[0]);                 //释放内存
             err2 = OSMemPut(MEMPointer,BuffAddr[1]);                 //释放内存
         }
-        OSTimeDlyHMSM(0,1,0,0); 
+        OSTimeDlyHMSM(0,5,0,100); 
+    }
+}
+
+/***************************************************
+说明：数字显示任务
+****************************************************/
+void TaskLCDNumDis(void *pdata)
+{
+    Uint8 err;
+    NUM_DisBuf * DisBufP;
+    pdata = pdata;
+   
+    for(;;){
+        DisBufP = OSMboxPend(LCDNumDisBox,0,&err); //等待LCD数字显示邮箱
+        OSMutexPend(FSMCMutex,0,&err);             //等待FSMC互斥信号量
+        LCD_WriteNum(DisBufP);                     //写数字到LCD
+        OSMutexPost(FSMCMutex);                    //释放FSMC互斥信号量
+        OSSemPost(LCDNumDisOverSemp);              //发送数字写完成信号
     }
 }
 

@@ -45,7 +45,19 @@
 /************************************************
 **说明: LCD背景色
 ************************************************/
-#define LCD_BACKGROUND_COLOR              (GRAY)
+#define LCD_BACKGROUND_COLOR              (0xffdd)
+
+
+/************************************************
+**说明: ADC 分度及分压倍数
+************************************************/
+#define ADC_VOLT_MAG_IN0        (Float32)((2.483 / (4096 * 32)) * 500)
+#define ADC_VOLT_MAG_IN1        (Float32)((2.483 / (4096 * 32)) * 400)
+#define ADC_VOLT_MAG_IN2        (Float32)((2.483 / (4096 * 32)) * 1000)
+#define ADC_VOLT_MAG_IN3        (Float32)((2.483 / (4096 * 32)) * 1000)
+#define ADC_VOLT_MAG_IN4        (Float32)((2.483 / (4096 * 32)) * 1000)
+#define ADC_VOLT_MAG_IN5        (Float32)((2.483 / (4096 * 32)) * 1000)
+
 
 
 

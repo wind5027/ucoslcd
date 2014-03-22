@@ -11,9 +11,9 @@
 */
 #ifndef ADC_CFG_H
 #define ADC_CFG_H
-#include "user_type.h"
-#include "stm32f10x.h"
+#include "user_cfg.h"
 
+#define ADC_Config ADC1_Config
 /*
 *************************************************************************************
 * 名    称：void ADC1_Config(void)

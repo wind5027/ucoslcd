@@ -57,13 +57,15 @@ void NVIC_Configuration(void)
 */
 void SysInit(void)
 {   
-    NVIC_Configuration();                     //中断配置
-    SystemInit();                             //系统时钟配置
+    NVIC_Configuration();  //中断配置
+    SystemInit();          //系统时钟配置
+  
+    LCD_Init();            //LCD初始化
+    RTC_Prepare();         //RTC初始化
 
-    SPI2_Config();                            //SPI2初始化
-    LCD_Init();
-    RTC_Prepare();
-   
-    SysTickConfig();                          //ucos系统时钟配置
+    ADC1_Config();         //ADC1配置
+    SPI2_Config();         //SPI2配置
+    
+    SysTickConfig();       //ucos系统时钟配置
 }
 

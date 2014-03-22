@@ -16,17 +16,22 @@
 /***************************************************
 任务堆栈大小
 ****************************************************/
-#define START_STK_SIZE   64
-#define RTC_STK_SIZE     64
-#define LCD_STK_SIZE     64
+#define START_STK_SIZE        (32)
+#define RTC_STK_SIZE          (64)
+#define LCD_STK_SIZE          (64)
+#define GET_VOLT_STK_SIZE     (64)
+
 
 
 /***************************************************
 设置任务优先级
 ****************************************************/
-#define START_TASK_PRIO     5
-#define RTC_TASK_PRIO       7
-#define LCD_TASK_PRIO       8
+#define START_TASK_PRIO        (5)
+#define NUM_DIS_TASK_PRIO      (6)
+#define RTC_TASK_PRIO          (7)
+#define GET_VOLT_TASK_PRIO     (8)
+#define LCD_BRG_TASK_PRIO      (9)
+
 
 
 
