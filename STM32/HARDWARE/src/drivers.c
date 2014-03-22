@@ -27,8 +27,4 @@
 
 #include "num_operation.c"
 
-#ifdef  USER_UCOSII
-#include "os_lcd_tft.c"
-
-#endif
 

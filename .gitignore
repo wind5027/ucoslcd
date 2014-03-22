@@ -1,4 +1,9 @@
 ﻿#以'#'开始的行，被视为注释.                                                                                         
+
+#忽略的目录
+/STM32/USER/list
+/STM32/USER/obj
+
                              
 *.*
 !.gitignore
@@ -36,8 +41,6 @@
 !*.Opt
 !*.ini
 !*._ia
-
-
 
 
 

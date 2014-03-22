@@ -50,67 +50,73 @@ void TaskGetADCVolt(void *pdata)
             VoltAverage->AVolt[4] = VoltAverage->AVolt[4] * ADC_VOLT_MAG_IN4; 
             VoltAverage->AVolt[5] = VoltAverage->AVolt[5] * ADC_VOLT_MAG_IN5; 
             
-            ADCDisBuf->NumSize                 = ASCII_24_48;
+            ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 140;                 //VIN0 X
-            ADCDisBuf->DisControl.Place.Y      = 136;                 //VIN0 Y
+            ADCDisBuf->DisControl.Place.Y      = 125;                 //VIN0 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
-            NUM_ShortHexToBCD(VoltAverage->AVolt[0],ADCDisBuf);
+            NUM_ShortHexToBCD(VoltAverage->AVolt[0],ADCDisBuf); //数据到显示缓存
+            NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
             OSMboxPost(LCDNumDisBox,ADCDisBuf);         //发送消息邮箱内容是显示VIN0
             OSSemPend(LCDNumDisOverSemp,0,&err);        //等待LCD数字显示完成信号
 
-            ADCDisBuf->NumSize                 = ASCII_24_48;
+            ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 530;                 //VIN1 X
-            ADCDisBuf->DisControl.Place.Y      = 136;                 //VIN1 Y
+            ADCDisBuf->DisControl.Place.Y      = 125;                 //VIN1 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[1],ADCDisBuf);
+            NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
             OSMboxPost(LCDNumDisBox,ADCDisBuf);         //发送消息邮箱内容是显示VIN1
             OSSemPend(LCDNumDisOverSemp,0,&err);        //等待LCD数字显示完成信号
             
-            ADCDisBuf->NumSize                 = ASCII_24_48;
+            ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 140;                 //VIN2 X
-            ADCDisBuf->DisControl.Place.Y      = 248;                 //VIN2 Y
+            ADCDisBuf->DisControl.Place.Y      = 236;                 //VIN2 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[2],ADCDisBuf);
+            NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
             OSMboxPost(LCDNumDisBox,ADCDisBuf);         //发送消息邮箱内容是显示VIN2
             OSSemPend(LCDNumDisOverSemp,0,&err);        //等待LCD数字显示完成信号
             
-            ADCDisBuf->NumSize                 = ASCII_24_48;
+            ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 530;                 //VIN3 X
-            ADCDisBuf->DisControl.Place.Y      = 248;                 //VIN3 Y
+            ADCDisBuf->DisControl.Place.Y      = 236;                 //VIN3 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[3],ADCDisBuf);
+            NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
             OSMboxPost(LCDNumDisBox,ADCDisBuf);         //发送消息邮箱内容是显示VIN3
             OSSemPend(LCDNumDisOverSemp,0,&err);        //等待LCD数字显示完成信号
             
-            ADCDisBuf->NumSize                 = ASCII_24_48;
+            ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 140;                 //VIN4 X
-            ADCDisBuf->DisControl.Place.Y      = 360;                 //VIN4 Y
+            ADCDisBuf->DisControl.Place.Y      = 355;                 //VIN4 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[4],ADCDisBuf);
+            NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
             OSMboxPost(LCDNumDisBox,ADCDisBuf);         //发送消息邮箱内容是显示VIN4
             OSSemPend(LCDNumDisOverSemp,0,&err);        //等待LCD数字显示完成信号
             
-            ADCDisBuf->NumSize                 = ASCII_24_48;
+            ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 530;                 //VIN5 X
-            ADCDisBuf->DisControl.Place.Y      = 350;                 //VIN5 Y
+            ADCDisBuf->DisControl.Place.Y      = 344;                 //VIN5 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[5],ADCDisBuf);
+            NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
             OSMboxPost(LCDNumDisBox,ADCDisBuf);         //发送消息邮箱内容是显示VIN5

@@ -10,6 +10,7 @@
 
 #define  OS_CPU_GLOBALS
 #include "includes.h"
+#include "stm32f10x.h"
 
 /******************************************************************************
 ** 函数名称: OSTaskStkInit
@@ -206,7 +207,7 @@ void OSTCBInitHook (OS_TCB *ptcb)
 */
 void OSTimeTickHook (void)
 {
-    //调用看门狗
+    IWDG_ReloadCounter();//调用看门狗喂狗
 }
 
 

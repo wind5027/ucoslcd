@@ -470,7 +470,7 @@ Uint8 LCD_DrawShape(LCD_DrawDat * DrawDat)
 * 出口参数：无
 *************************************************************************************
 */
-const Uint16 ASIICSizeTable[] = {0x0808,0x080f,0x1830}; //ASCII字库字体size表，索引标示见word.h
+const Uint16 ASIICSizeTable[] = {0x0808,0x080f,0x1830,0x2040}; //ASCII字库字体size表，索引标示见word.h
 void LCD_WriteNum(NUM_DisBuf * Disp)
 {
     Uint8 n,x,y;

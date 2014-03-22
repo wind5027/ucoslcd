@@ -33,6 +33,23 @@ void SysTickConfig(void)
     SysTick_Config(reload);                               //reload为24位寄存器,最大值:16777216,在72M下,约合1.86s左右
 #endif
 }
+
+/*
+*************************************************************************************
+* 名    称：void IWDG_Init(void)
+* 功    能：独立看门狗初始化使能
+* 入口参数：无
+* 出口参数：无
+*************************************************************************************
+*/
+void IWDG_Init(void)
+{
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);   //使能IWDG_PR 和IWDG_RLR 的写操作 
+	IWDG_SetPrescaler(IWDG_Prescaler_32);           //设置IWDG 预分频值 
+	IWDG_SetReload((40 * 1000 / 32)* 3);            //设置IWDG 重装载值 
+	IWDG_ReloadCounter();                           //重装载IWDG 计数器 
+	IWDG_Enable();                                  //使能IWDG 
+}
 
 /*
 *************************************************************************************
@@ -46,6 +63,9 @@ void NVIC_Configuration(void)
 {
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
 }
+
+
+
 
 /*
 *************************************************************************************
@@ -65,6 +85,8 @@ void SysInit(void)
 
     ADC1_Config();         //ADC1配置
     SPI2_Config();         //SPI2配置
+    
+    //IWDG_Init();           //开启看门狗
     
     SysTickConfig();       //ucos系统时钟配置
 }

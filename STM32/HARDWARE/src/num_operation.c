@@ -28,6 +28,23 @@ void NUM_BCDToDisBuf(NUM_DisBuf * DisDat)
 
 /*
 *************************************************************************************
+* 名    称：void NUM_OffZeroDisBuf(TimeDat * CurrentTime,NUM_DisBuf * DisDat)
+* 功    能：BCD显示缓存灭零
+* 入口参数：NUM_DisBuf * DisDat
+* 出口参数：无
+*************************************************************************************
+*/
+void NUM_OffZeroDisBuf(NUM_DisBuf * DisDat)
+{
+    Uint8 i;
+    for(i = 0;i < DisDat->ZeroN;i ++){
+        DisDat->DisBuf[i] = Ascii[DisDat->NumSize][0x20];
+    }
+}
+
+
+/*
+*************************************************************************************
 * 名    称：void NUM_TimeDatToDisBuf(TimeDat * CurrentTime,NUM_DisBuf * DisDat)
 * 功    能：rtc数据转换到BCD到显示缓存
 * 入口参数：TimeDat * CurrentTime
