@@ -19,8 +19,13 @@
 #include "word.h"
 
 
+
+/***************************************************
+任务代码
+****************************************************/
 #include "task_rtc.c"#include "task_lcd.c"
 #include "task_adc.c"
+//#include "task_key.c"
 
 
 
@@ -61,16 +66,15 @@ void TaskStart(void * pdata)
     OSTaskCreate(TaskLCDNumDis, (void * )0,                           //创建LCD数字显示任务
                  (OS_STK *)&TASK_NUM_DIS_STK[LCD_STK_SIZE-1], 
                  NUM_DIS_TASK_PRIO);   
-    OSTaskCreate(TaskRTCUpdate, (void * )0,                           //创建RTC更新任务 
-                 (OS_STK *)&TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE-1], 
-                 RTC_TASK_PRIO);
-    OSTaskCreate(TaskGetADCVolt, (void * )0,                          //创建ADC 电压值获取任务 
-                 (OS_STK *)&TASK_GET_VOLT_STK[GET_VOLT_STK_SIZE-1], 
-                 GET_VOLT_TASK_PRIO);
-
     OSTaskCreate(TaskLCDBrgUpdate, (void * )0,                        //创建背景图片更新任务 
                  (OS_STK *)&TASK_LCD_BKRG_UPDATE_STK[LCD_STK_SIZE-1], 
                  LCD_BRG_TASK_PRIO);
+    OSTaskCreate(TaskGetADCVolt, (void * )0,                          //创建ADC 电压值获取任务 
+                 (OS_STK *)&TASK_GET_VOLT_STK[GET_VOLT_STK_SIZE-1], 
+                 GET_VOLT_TASK_PRIO);
+    OSTaskCreate(TaskRTCUpdate, (void * )0,                           //创建RTC更新任务 
+                 (OS_STK *)&TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE-1], 
+                 RTC_TASK_PRIO);
                  
     OS_EXIT_CRITICAL();                     //退出临界区
     

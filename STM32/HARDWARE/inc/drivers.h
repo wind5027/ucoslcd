@@ -19,8 +19,11 @@
 #include "rtc_cfg.h"
 #include "spi_cfg.h"
 #include "adc_cfg.h"
+#include "isr_cfg.h"
 
+#include "key.h"
 #include "lcd_tft.h"
+
 
 
 #endif

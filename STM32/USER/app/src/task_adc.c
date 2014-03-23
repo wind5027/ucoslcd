@@ -35,7 +35,7 @@ void TaskGetADCVolt(void *pdata)
         ADCDisBuf   = (NUM_DisBuf *)(VoltAverage + sizeof(VoltageDat));
         if(err == OS_ERR_NONE){
             for(i = 0; i < 32; i ++){
-                OSTimeDlyHMSM(0,0,0,10);
+                OSTimeDlyHMSM(0,0,0,20);
                 VoltAverage->AVolt[0] += ADC1ValueArray[0];
                 VoltAverage->AVolt[1] += ADC1ValueArray[1];
                 VoltAverage->AVolt[2] += ADC1ValueArray[2];

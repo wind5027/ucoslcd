@@ -55,29 +55,11 @@ void GPIO_Config(Uint16 GPIOMask , Uint16 FMask)
     }
     if(ReadMask(GPIOMask,EN_GPIO_KEY) == EN_GPIO_KEY){
         RCC_APB2PeriphClockCmd(RCC_KEY_PORT , ENABLE);      //开启KEY端口时钟
-        
-        if(ReadMask(FMask, EN_GPIO_KEY) == EN_GPIO_KEY){    
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;   //keyA为推挽输出口
-            GPIO_InitStructure.GPIO_Pin   = GPIOA_KEY_PIN;
-            GPIO_Init(KEYA_PORT,&GPIO_InitStructure);
-            
-            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPD;      //keyB为下拉输入口
-            GPIO_InitStructure.GPIO_Pin   = GPIOC_KEY_PIN;
-            GPIO_Init(KEYB_PORT,&GPIO_InitStructure);
-        }
-        else{
-            GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPD;      //keyA为下拉输入口
-            GPIO_InitStructure.GPIO_Pin   = GPIOA_KEY_PIN;
-            GPIO_Init(KEYA_PORT,&GPIO_InitStructure);
-            
-            GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;   //keyB为推挽输出口
-            GPIO_InitStructure.GPIO_Pin   = GPIOC_KEY_PIN;
-            GPIO_Init(KEYB_PORT,&GPIO_InitStructure);
-        }
+  
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN_FLOATING  ;   //key为悬浮输入
+        GPIO_InitStructure.GPIO_Pin   = KEY_PIN;
+        GPIO_Init(KEY_PORT,&GPIO_InitStructure);
     }
     if(ReadMask(GPIOMask,EN_GPIO_LED) == EN_GPIO_LED){
         RCC_APB2PeriphClockCmd(RCC_LED_PORT , ENABLE);      //开启LED端口时钟

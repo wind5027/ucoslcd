@@ -39,7 +39,8 @@
 **************************************************/
 #define RCC_FSMC_PORT                                \
         RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE  \
-      | RCC_APB2Periph_GPIOF | RCC_APB2Periph_GPIOG 
+      | RCC_APB2Periph_GPIOF | RCC_APB2Periph_GPIOG  \
+      | RCC_APB2Periph_AFIO
 
 #define GPIOD_FSMC_PIN                                          \
         GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_3  | GPIO_Pin_4    \
@@ -64,28 +65,19 @@
 /**************************************************
 说明：ADC1端口相关
 **************************************************/
-#define RCC_ADC1_PORT   RCC_APB2Periph_GPIOA
+#define RCC_ADC1_PORT   RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO
 #define ADC1_PORT       GPIOA
 
 #define  ADC1_PIN     GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3  \
                     | GPIO_Pin_4  | GPIO_Pin_5  | GPIO_Pin_6  | GPIO_Pin_7 
 
 
-
-
-
-
-
-
-
 /**************************************************
 说明：KEY端口相关
 **************************************************/
-#define RCC_KEY_PORT   RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOC
-#define KEYA_PORT       GPIOA
-#define KEYB_PORT       GPIOC
-#define GPIOA_KEY_PIN   GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3
-#define GPIOC_KEY_PIN   GPIO_Pin_0  | GPIO_Pin_1  | GPIO_Pin_2  | GPIO_Pin_3
+#define RCC_KEY_PORT    RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO
+#define KEY_PORT        GPIOE
+#define KEY_PIN         GPIO_Pin_2  | GPIO_Pin_3  | GPIO_Pin_4  | GPIO_Pin_5
 
 /**************************************************
 说明：LED端口相关
@@ -156,7 +148,7 @@ do{                                             \
 /**************************************************
 说明：SPI1端口相关
 **************************************************/
-#define RCC_SPI1_PORT   RCC_APB2Periph_GPIOA 
+#define RCC_SPI1_PORT   RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO 
 #define SPI1_PORT       GPIOA
 #define SPI1_SCK_PIN    GPIO_Pin_5
 #define SPI1_MISO_PIN   GPIO_Pin_6
@@ -166,7 +158,7 @@ do{                                             \
 /**************************************************
 说明：SPI2端口相关
 **************************************************/
-#define RCC_SPI2_PORT   RCC_APB2Periph_GPIOB 
+#define RCC_SPI2_PORT   RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO 
 #define SPI2_PORT       GPIOB
 #define SPI2_SCK_PIN    GPIO_Pin_13
 #define SPI2_MISO_PIN   GPIO_Pin_14

@@ -26,7 +26,8 @@ void TaskLCDBrgUpdate(void *pdata)
 {
     Uint8 err1;
     Uint8 err2;
-    Uint16 cnt;  
+    Uint16 cnt;
+    pdata = pdata;    
     
     for(;;){
         cnt = 0;
@@ -38,7 +39,7 @@ void TaskLCDBrgUpdate(void *pdata)
             
             LCD_SetCursorXY(0,0);               //设置光标起点 准备写数据          
 
-            while(cnt < 800 * 480 * 2 / PARTITION_LENGTH){ //计算满屏数据搬运次数
+            while(cnt < 800 * 480 * 2 / PARTITION_LENGTH){ //计算满屏数据搬运次数  使用双buff交替传输
                 ControlDat.DMA_PeripheralBaseAddr = (Uint32)&SPI2->DR;             //SPI2->DR  外设地址
                 ControlDat.DMA_MemoryBaseAddr     = (Uint32)BuffAddr[cnt & 0x01];  //存储器地址
                 ControlDat.DMA_BufferSize         = PARTITION_LENGTH;              //DMA传输长度
@@ -62,7 +63,7 @@ void TaskLCDBrgUpdate(void *pdata)
             err1 = OSMemPut(MEMPointer,BuffAddr[0]);                 //释放内存
             err2 = OSMemPut(MEMPointer,BuffAddr[1]);                 //释放内存
         }
-        OSTimeDlyHMSM(0,5,0,100); 
+        OSTimeDlyHMSM(0,0,0,500); 
     }
 }
 

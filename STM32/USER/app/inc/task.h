@@ -27,10 +27,12 @@
 设置任务优先级
 ****************************************************/
 #define START_TASK_PRIO        (5)
-#define NUM_DIS_TASK_PRIO      (6)
-#define RTC_TASK_PRIO          (7)
-#define GET_VOLT_TASK_PRIO     (8)
+#define NUM_DIS_TASK_PRIO      (8)
 #define LCD_BRG_TASK_PRIO      (9)
+#define GET_VOLT_TASK_PRIO     (10)
+#define RTC_TASK_PRIO          (11)
+
+
 
 
 

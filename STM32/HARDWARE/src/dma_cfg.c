@@ -153,12 +153,10 @@ void DMA_Config(DMA_ControlDat * ControlDat,Uint16 DMAMask )
 */
 void DMA_ChannelCmd(Uint16 DMAMask ,FunctionalState NewState)
 {
-    NVIC_InitTypeDef NVIC_InitStructure;
-    
     if((ReadMask(DMAMask,EN_DMA_LCD_CLR) == EN_DMA_LCD_CLR) || 
        (ReadMask(DMAMask,EN_DMA_LCD_DAT) == EN_DMA_LCD_DAT)) {       
         DMA_ClearFlag(DMA1_FLAG_GL6|DMA1_FLAG_TC6|DMA1_FLAG_HT6|DMA1_FLAG_TE6);
-//      DMA_ITConfig(DMA1_Channel1,DMA_IT_TC,NewState);
+//        DMA_ITConfig(DMA1_Channel6,DMA_IT_TC,NewState);
         DMA_Cmd(DMA1_Channel6,NewState);
     }
     
@@ -171,12 +169,7 @@ void DMA_ChannelCmd(Uint16 DMAMask ,FunctionalState NewState)
         DMA_ITConfig(DMA1_Channel3,DMA_IT_TC,NewState);         
     }
     if(ReadMask(DMAMask,EN_DMA_SPI2) == EN_DMA_SPI2){
-        NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel4_IRQn;
-		NVIC_InitStructure.NVIC_IRQChannelCmd = NewState;
-		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-		NVIC_Init(&NVIC_InitStructure);
-        
+       
         DMA_ClearFlag(DMA1_FLAG_GL4|DMA1_FLAG_TC4|DMA1_FLAG_HT4|DMA1_FLAG_TE4);
         DMA_ClearFlag(DMA1_FLAG_GL5|DMA1_FLAG_TC5|DMA1_FLAG_HT5|DMA1_FLAG_TE5); 
         DMA_ITConfig(DMA1_Channel4,DMA_IT_TC,ENABLE);

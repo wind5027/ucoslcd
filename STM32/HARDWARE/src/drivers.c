@@ -14,13 +14,19 @@
 #define  DRIVERS_ENABLE
 #include "user_cfg.h"
 
+
+/***************************************************
+驱动代码
+****************************************************/
 #include "fsmc_cfg.c"
 #include "gpio_cfg.c"
 #include "dma_cfg.c"
 #include "rtc_cfg.c"
 #include "spi_cfg.c"
 #include "adc_cfg.c"
+#include "isr_cfg.c"
 
+#include "key.c"
 #include "lcd_tft.c"
 #include "spi_devices.c"
 

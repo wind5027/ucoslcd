@@ -50,44 +50,28 @@ void IWDG_Init(void)
 	IWDG_ReloadCounter();                           //重装载IWDG 计数器 
 	IWDG_Enable();                                  //使能IWDG 
 }
-
-/*
-*************************************************************************************
-* 名    称：void NVIC_Configuration(void)
-* 功    能：NVIC中断设置
-* 入口参数：无
-* 出口参数：无
-*************************************************************************************
-*/
-void NVIC_Configuration(void)
-{
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
-}
 
-
-
-
 /*
 *************************************************************************************
 * 名    称：void SysInit(void)
-* 功    能：系统初始化
+* 功    能：硬件初始化
 * 入口参数：无
 * 出口参数：无
 *************************************************************************************
 */
 void SysInit(void)
 {   
-    NVIC_Configuration();  //中断配置
     SystemInit();          //系统时钟配置
-  
     LCD_Init();            //LCD初始化
-    RTC_Prepare();         //RTC初始化
-
-    ADC1_Config();         //ADC1配置
+    RTC_Prepare();         //RTC初始化     
     SPI2_Config();         //SPI2配置
-    
-    //IWDG_Init();           //开启看门狗
+    ADC1_Config();         //ADC1配置    
+    KEY_Config();          //键盘配置
+  
+//    IWDG_Init();           //开启看门狗
     
     SysTickConfig();       //ucos系统时钟配置
+    
+    NVIC_Configuration();  //中断配置
 }
 

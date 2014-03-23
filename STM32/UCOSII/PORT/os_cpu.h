@@ -1,4 +1,4 @@
-﻿/************************ (C) COPYLEFT 2010 Leafgrass *************************
+/************************ (C) COPYLEFT 2010 Leafgrass *************************
 
 * File Name		: os_cpu_c.c 
 * Author		: Librae
@@ -62,8 +62,8 @@ typedef unsigned int   OS_CPU_SR;		/* Define size of CPU status register*/
 */
 
 #if OS_CRITICAL_METHOD == 4
-	 void OS_ENTER_CRITICAL (void);
-     void OS_EXIT_CRITICAL (void);     
+    void OS_ENTER_CRITICAL (void);
+    void OS_EXIT_CRITICAL (void);     
 #endif
 
 void       OSCtxSw(void);

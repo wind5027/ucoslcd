@@ -75,27 +75,6 @@ void DebugMon_Handler(void)
 {
 }
 
-void DMA1_Channel1_IRQHandler(void)
-{
-    OSIntEnter();
-
-    switch(LcdDmaDat.DMA_Mode){
-        case EN_DMA_LCD_CLR :
-            LcdDmaDat.DMA_InterruptCnt ++;
-            if(LcdDmaDat.DMA_InterruptCnt > LcdDmaDat.DMA_InterruptMax){
-                DMA_ChannelCmd(EN_DMA_LCD_CLR,DISABLE);
-            }
-            break;
-        case EN_DMA_LCD_DAT :
-            break;
-        default : break;
-    }
-    DMA_ClearITPendingBit(DMA1_FLAG_GL1 | DMA1_FLAG_TC1 | DMA1_FLAG_HT1 | DMA1_FLAG_TE1);    
- 
-    OSIntExit();
-}
-
-
 
 void DMA1_Channel4_IRQHandler(void)
 {
@@ -108,6 +87,51 @@ void DMA1_Channel4_IRQHandler(void)
 	DMA_ClearITPendingBit(DMA1_FLAG_GL4 | DMA1_FLAG_TC4 | DMA1_FLAG_HT4 | DMA1_FLAG_TE4);
     OSIntExit();
 }
+
+void DMA1_Channel6_IRQHandler(void)
+{
+    OSIntEnter();
+    switch(LcdDmaDat.DMA_Mode){
+        case EN_DMA_LCD_CLR :
+            break;
+        case EN_DMA_LCD_DAT :
+            break;
+        default : break;
+    }
+    DMA_ClearITPendingBit(DMA1_FLAG_GL6 | DMA1_FLAG_TC6 | DMA1_FLAG_HT6 | DMA1_FLAG_TE6);     
+    OSIntExit();
+}
+void EXTI2_IRQHandler(void)
+{
+    OSIntEnter();
+    EXTI_ClearFlag(EXTI_Line2); 
+    EXTI_ClearITPendingBit(EXTI_Line2);
+    OSIntExit();
+}
+
+void EXTI3_IRQHandler(void)
+{
+    OSIntEnter();
+    EXTI_ClearFlag(EXTI_Line3); 
+    EXTI_ClearITPendingBit(EXTI_Line3);
+    OSIntExit();
+}
+
+void EXTI4_IRQHandler(void)
+{
+    OSIntEnter();
+    EXTI_ClearFlag(EXTI_Line4); 
+    EXTI_ClearITPendingBit(EXTI_Line4);
+    OSIntExit();
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+    OSIntEnter();
+    EXTI_ClearFlag(EXTI_Line5); 
+    EXTI_ClearITPendingBit(EXTI_Line5);
+    OSIntExit();
+}
  
 /*
 void PendSV_Handler(void)
@@ -117,6 +141,7 @@ void PendSV_Handler(void)
 #ifdef OS_CRITICAL_METHOD 	//如果OS_CRITICAL_METHOD定义了,说明使用ucosII了.
 //systick中断服务函数,使用ucos时用到
 void SysTick_Handler(void)
+
 {				   
 	OSIntEnter();		//进入中断
     OSTimeTick();       //调用ucos的时钟服务程序               
