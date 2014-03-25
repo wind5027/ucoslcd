@@ -72,9 +72,9 @@ void TaskStart(void * pdata)
     OSTaskCreate(TaskGetADCVolt, (void * )0,                          //创建ADC 电压值获取任务 
                  (OS_STK *)&TASK_GET_VOLT_STK[GET_VOLT_STK_SIZE-1], 
                  GET_VOLT_TASK_PRIO);
-    OSTaskCreate(TaskRTCUpdate, (void * )0,                           //创建RTC更新任务 
-                 (OS_STK *)&TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE-1], 
-                 RTC_TASK_PRIO);
+//    OSTaskCreate(TaskRTCUpdate, (void * )0,                           //创建RTC更新任务 
+//                 (OS_STK *)&TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE-1], 
+//                 RTC_TASK_PRIO);
                  
     OS_EXIT_CRITICAL();                     //退出临界区
     

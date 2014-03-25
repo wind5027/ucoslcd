@@ -12,7 +12,7 @@ int main(void)
     OSTaskCreate( TaskStart,  //创建开始任务
                   (void *)0,  //parameter
                   (OS_STK *)&TASK_START_STK[START_STK_SIZE-1],  //task stack top pointer
-                  START_TASK_PRIO );  //task priority
+                  START_TASK_PRIO );                            //task priority
     OSStart();  //UCOSII系统启动
     return 0;
 }  

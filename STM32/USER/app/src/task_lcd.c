@@ -63,7 +63,7 @@ void TaskLCDBrgUpdate(void *pdata)
             err1 = OSMemPut(MEMPointer,BuffAddr[0]);                 //释放内存
             err2 = OSMemPut(MEMPointer,BuffAddr[1]);                 //释放内存
         }
-        OSTimeDlyHMSM(0,0,0,500); 
+        OSTimeDlyHMSM(0,5,0,0); 
     }
 }
 

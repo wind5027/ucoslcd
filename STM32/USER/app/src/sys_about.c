@@ -68,7 +68,7 @@ void SysInit(void)
     ADC1_Config();         //ADC1配置    
     KEY_Config();          //键盘配置
   
-//    IWDG_Init();           //开启看门狗
+    IWDG_Init();           //开启看门狗
     
     SysTickConfig();       //ucos系统时钟配置
     

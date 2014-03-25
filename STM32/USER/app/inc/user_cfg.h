@@ -52,12 +52,12 @@
 **说明: ADC 分度及分压倍数
 ************************************************/
 #define ADC_VREF_SET            (Float32)(2.483)
-#define ADC_VOLT_MAG_IN0        (Float32)((ADC_VREF_SET / (4096 * 32)) * 100)
-#define ADC_VOLT_MAG_IN1        (Float32)((ADC_VREF_SET / (4096 * 32)) * 100)
-#define ADC_VOLT_MAG_IN2        (Float32)((ADC_VREF_SET / (4096 * 32)) * 100)
-#define ADC_VOLT_MAG_IN3        (Float32)((ADC_VREF_SET / (4096 * 32)) * 1000)
-#define ADC_VOLT_MAG_IN4        (Float32)((ADC_VREF_SET / (4096 * 32)) * 1000)
-#define ADC_VOLT_MAG_IN5        (Float32)((ADC_VREF_SET / (4096 * 32)) * 1000)
+#define ADC_VOLT_MAG_IN0        (Float32)((ADC_VREF_SET / (4096 * 32)) * 400)
+#define ADC_VOLT_MAG_IN1        (Float32)((ADC_VREF_SET / (4096 * 32)) * 400)
+#define ADC_VOLT_MAG_IN2        (Float32)((ADC_VREF_SET / (4096 * 32)) * 400)
+#define ADC_VOLT_MAG_IN3        (Float32)((ADC_VREF_SET / (4096 * 32)) * 400)
+#define ADC_VOLT_MAG_IN4        (Float32)((ADC_VREF_SET / (4096 * 32)) * 400)
+#define ADC_VOLT_MAG_IN5        (Float32)((ADC_VREF_SET / (4096 * 32)) * 1000) /*12V 直流分压比*/
 
 
 

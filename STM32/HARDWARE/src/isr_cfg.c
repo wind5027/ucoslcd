@@ -89,7 +89,6 @@ void EXTI_Configuration(void)
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;                     //打开中断     
     EXTI_Init(&EXTI_InitStructure);
     EXTI_ClearITPendingBit(EXTI_Line2 | EXTI_Line3 | EXTI_Line4 | EXTI_Line5);	
-
 } 
 
 

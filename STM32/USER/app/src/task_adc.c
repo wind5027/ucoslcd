@@ -52,7 +52,7 @@ void TaskGetADCVolt(void *pdata)
             
             ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 140;                 //VIN0 X
-            ADCDisBuf->DisControl.Place.Y      = 125;                 //VIN0 Y
+            ADCDisBuf->DisControl.Place.Y      = 120;                 //VIN0 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[0],ADCDisBuf); //数据到显示缓存
@@ -64,7 +64,7 @@ void TaskGetADCVolt(void *pdata)
 
             ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 530;                 //VIN1 X
-            ADCDisBuf->DisControl.Place.Y      = 125;                 //VIN1 Y
+            ADCDisBuf->DisControl.Place.Y      = 120;                 //VIN1 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[1],ADCDisBuf);
@@ -76,7 +76,7 @@ void TaskGetADCVolt(void *pdata)
             
             ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 140;                 //VIN2 X
-            ADCDisBuf->DisControl.Place.Y      = 236;                 //VIN2 Y
+            ADCDisBuf->DisControl.Place.Y      = 233;                 //VIN2 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[2],ADCDisBuf);
@@ -88,7 +88,7 @@ void TaskGetADCVolt(void *pdata)
             
             ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 530;                 //VIN3 X
-            ADCDisBuf->DisControl.Place.Y      = 236;                 //VIN3 Y
+            ADCDisBuf->DisControl.Place.Y      = 233;                 //VIN3 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
             NUM_ShortHexToBCD(VoltAverage->AVolt[3],ADCDisBuf);
@@ -103,7 +103,7 @@ void TaskGetADCVolt(void *pdata)
             ADCDisBuf->DisControl.Place.Y      = 355;                 //VIN4 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
-            NUM_ShortHexToBCD(VoltAverage->AVolt[4],ADCDisBuf);
+            NUM_ShortHexToBCD(VoltAverage->AVolt[5],ADCDisBuf);
             NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
@@ -112,10 +112,10 @@ void TaskGetADCVolt(void *pdata)
             
             ADCDisBuf->NumSize                 = ASCII_32_64;
             ADCDisBuf->DisControl.Place.X      = 530;                 //VIN5 X
-            ADCDisBuf->DisControl.Place.Y      = 344;                 //VIN5 Y
+            ADCDisBuf->DisControl.Place.Y      = 355;                 //VIN5 Y
             ADCDisBuf->DisControl.WordColor    = RED;
             ADCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR; 
-            NUM_ShortHexToBCD(VoltAverage->AVolt[5],ADCDisBuf);
+            NUM_ShortHexToBCD(VoltAverage->AVolt[4],ADCDisBuf);
             NUM_OffZeroDisBuf(ADCDisBuf);                       //灭零
             ADCDisBuf->Offset                  = 0;
             ADCDisBuf->DisN                    = 4;                    
