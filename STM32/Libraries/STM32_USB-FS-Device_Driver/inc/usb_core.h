@@ -1,17 +1,30 @@
-/******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
-* File Name          : usb_core.h
-* Author             : MCD Application Team
-* Version            : V3.0.1
-* Date               : 04/27/2009
-* Description        : Standard protocol processing functions prototypes
-********************************************************************************
-* THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-* WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
-* AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
-* INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
-* CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
-* INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-*******************************************************************************/
+/**
+  ******************************************************************************
+  * @file    usb_core.h
+  * @author  MCD Application Team
+  * @version V4.0.0
+  * @date    28-August-2012
+  * @brief   Standard protocol processing functions prototypes
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  *
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software 
+  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
+  ******************************************************************************
+  */
+
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USB_CORE_H
@@ -44,11 +57,11 @@ ONE_DESCRIPTOR, *PONE_DESCRIPTOR;
    the software will STALL the correspond endpoint */
 typedef enum _RESULT
 {
-  USB_SUCCESS = 0,    /* Process sucessfully */
+  USB_SUCCESS = 0,    /* Process successfully */
   USB_ERROR,
   USB_UNSUPPORT,
   USB_NOT_READY       /* The process has not been finished, endpoint will be
-                         NAK to further rquest */
+                         NAK to further request */
 } RESULT;
 
 
@@ -173,7 +186,10 @@ typedef struct _DEVICE_PROP
   uint8_t* (*GetConfigDescriptor)(uint16_t Length);
   uint8_t* (*GetStringDescriptor)(uint16_t Length);
 
-  uint8_t* RxEP_buffer;
+  /* This field is not used in current library version. It is kept only for 
+   compatibility with previous versions */
+  void* RxEP_buffer;
+   
   uint8_t MaxPacketSize;
 
 }DEVICE_PROP;
@@ -235,9 +251,9 @@ extern  DEVICE  Device_Table;
 extern DEVICE_INFO Device_Info;
 
 /* cells saving status during interrupt servicing */
-extern uint16_t SaveRState;
-extern uint16_t SaveTState;
+extern __IO uint16_t SaveRState;
+extern __IO uint16_t SaveTState;
 
 #endif /* __USB_CORE_H */
 
-/******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

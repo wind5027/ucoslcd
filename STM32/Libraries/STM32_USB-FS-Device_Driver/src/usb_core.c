@@ -1,27 +1,38 @@
-/******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
-* File Name          : usb_core.c
-* Author             : MCD Application Team
-* Version            : V3.0.1
-* Date               : 04/27/2009
-* Description        : Standard protocol processing (USB v2.0)
-********************************************************************************
-* THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-* WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
-* AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
-* INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
-* CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
-* INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
-*******************************************************************************/
+/**
+  ******************************************************************************
+  * @file    usb_core.c
+  * @author  MCD Application Team
+  * @version V4.0.0
+  * @date    28-August-2012
+  * @brief   Standard protocol processing (USB v2.0)
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
+  *
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software 
+  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
+  ******************************************************************************
+  */
+
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_lib.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-typedef enum {FALSE = 0, TRUE = !FALSE} bool;
 #define ValBit(VAR,Place)    (VAR & (1 << Place))
 #define SetBit(VAR,Place)    (VAR |= (1 << Place))
 #define ClrBit(VAR,Place)    (VAR &= ((1 << Place) ^ 255))
-
 #define Send0LengthData() { _SetEPTxCount(ENDP0, 0); \
     vSetEPTxStatus(EP_TX_VALID); \
   }
@@ -38,6 +49,7 @@ typedef enum {FALSE = 0, TRUE = !FALSE} bool;
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 uint16_t_uint8_t StatusInfo;
+
 bool Data_Mul_MaxPacketSize = FALSE;
 /* Private function prototypes -----------------------------------------------*/
 static void DataStageOut(void);
@@ -69,7 +81,7 @@ uint8_t *Standard_GetConfiguration(uint16_t Length)
 /*******************************************************************************
 * Function Name  : Standard_SetConfiguration.
 * Description    : This routine is called to set the configuration value
-*                  Then each class should configure device themself.
+*                  Then each class should configure device itself.
 * Input          : None.
 * Output         : None.
 * Return         : Return USB_SUCCESS, if the request is performed.
@@ -164,8 +176,8 @@ uint8_t *Standard_GetStatus(uint16_t Length)
     return 0;
   }
 
-  StatusInfo.w = 0;
   /* Reset Status Information */
+  StatusInfo.w = 0;
 
   if (Type_Recipient == (STANDARD_REQUEST | DEVICE_RECIPIENT))
   {
@@ -177,15 +189,19 @@ uint8_t *Standard_GetStatus(uint16_t Length)
     {
       SetBit(StatusInfo0, 1);
     }
+    else
+    {
+      ClrBit(StatusInfo0, 1);
+    }      
 
     /* Bus-powered */
     if (ValBit(Feature, 6))
     {
-      ClrBit(StatusInfo0, 0);
+      SetBit(StatusInfo0, 0);
     }
     else /* Self-powered */
     {
-      SetBit(StatusInfo0, 0);
+      ClrBit(StatusInfo0, 0);
     }
   }
   /*Interface Status*/
@@ -328,7 +344,7 @@ RESULT Standard_SetEndPointFeature(void)
   uint32_t    wIndex0;
   uint32_t    Related_Endpoint;
   uint32_t    rEP;
-  uint32_t   Status;
+  uint32_t    Status;
 
   wIndex0 = pInformation->USBwIndex0;
   rEP = wIndex0 & ~0x80;
@@ -445,8 +461,8 @@ void DataStageOut(void)
     Buffer = (*pEPinfo->CopyData)(Length);
     pEPinfo->Usb_rLength -= Length;
     pEPinfo->Usb_rOffset += Length;
-
     PMAToUserBufferCopy(Buffer, GetEPRxAddr(ENDP0), Length);
+
   }
 
   if (pEPinfo->Usb_rLength != 0)
@@ -504,6 +520,7 @@ void DataStageIn(void)
       /* No more data to send so STALL the TX Status*/
       ControlState = WAIT_STATUS_OUT;
       vSetEPTxStatus(EP_TX_STALL);
+ 
     }
     
     goto Expect_Status_Out;
@@ -518,7 +535,7 @@ void DataStageIn(void)
   }
 
   DataBuffer = (*pEPinfo->CopyData)(Length);
-
+  
   UserToPMABufferCopy(DataBuffer, GetEPTxAddr(ENDP0), Length);
 
   SetEPTxCount(ENDP0, Length);
@@ -574,9 +591,8 @@ void NoData_Setup0(void)
     /*SET FEATURE for Device*/
     else if (RequestNo == SET_FEATURE)
     {
-      if ((pInformation->USBwValue0 == DEVICE_REMOTE_WAKEUP)
-          && (pInformation->USBwIndex == 0)
-          && (ValBit(pInformation->Current_Feature, 5)))
+      if ((pInformation->USBwValue0 == DEVICE_REMOTE_WAKEUP) \
+          && (pInformation->USBwIndex == 0))
       {
         Result = Standard_SetDeviceFeature();
       }
@@ -678,6 +694,7 @@ void Data_Setup0(void)
   CopyRoutine = NULL;
   wOffset = 0;
 
+  /*GET DESCRIPTOR*/
   if (Request_No == GET_DESCRIPTOR)
   {
     if (Type_Recipient == (STANDARD_REQUEST | DEVICE_RECIPIENT))
@@ -805,7 +822,7 @@ void Data_Setup0(void)
     /* Device ==> Host */
     __IO uint32_t wLength = pInformation->USBwLength;
      
-    /* Restrict the data length to be the one host asks */
+    /* Restrict the data length to be the one host asks for */
     if (pInformation->Ctrl_Info.Usb_wLength > wLength)
     {
       pInformation->Ctrl_Info.Usb_wLength = wLength;
@@ -850,18 +867,19 @@ uint8_t Setup0_Process(void)
     uint8_t* b;
     uint16_t* w;
   } pBuf;
-
+  uint16_t offset = 1;
+  
   pBuf.b = PMAAddr + (uint8_t *)(_GetEPRxAddr(ENDP0) * 2); /* *2 for 32 bits addr */
 
   if (pInformation->ControlState != PAUSE)
   {
     pInformation->USBbmRequestType = *pBuf.b++; /* bmRequestType */
     pInformation->USBbRequest = *pBuf.b++; /* bRequest */
-    pBuf.w++;  /* word not accessed because of 32 bits addressing */
+    pBuf.w += offset;  /* word not accessed because of 32 bits addressing */
     pInformation->USBwValue = ByteSwap(*pBuf.w++); /* wValue */
-    pBuf.w++;  /* word not accessed because of 32 bits addressing */
+    pBuf.w += offset;  /* word not accessed because of 32 bits addressing */
     pInformation->USBwIndex  = ByteSwap(*pBuf.w++); /* wIndex */
-    pBuf.w++;  /* word not accessed because of 32 bits addressing */
+    pBuf.w += offset;  /* word not accessed because of 32 bits addressing */
     pInformation->USBwLength = *pBuf.w; /* wLength */
   }
 
@@ -930,7 +948,12 @@ uint8_t Out0_Process(void)
 {
   uint32_t ControlState = pInformation->ControlState;
 
-  if ((ControlState == OUT_DATA) || (ControlState == LAST_OUT_DATA))
+  if ((ControlState == IN_DATA) || (ControlState == LAST_IN_DATA))
+  {
+    /* host aborts the transfer before finish */
+    ControlState = STALLED;
+  }
+  else if ((ControlState == OUT_DATA) || (ControlState == LAST_OUT_DATA))
   {
     DataStageOut();
     ControlState = pInformation->ControlState; /* may be changed outside the function */
@@ -942,11 +965,6 @@ uint8_t Out0_Process(void)
     ControlState = STALLED;
   }
 
-  else if ((ControlState == IN_DATA) || (ControlState == LAST_IN_DATA))
-  {
-    /* host aborts the transfer before finish */
-    ControlState = STALLED;
-  }
 
   /* Unexpect state, STALL the endpoint */
   else
@@ -969,6 +987,7 @@ uint8_t Out0_Process(void)
 *******************************************************************************/
 uint8_t Post0_Process(void)
 {
+   
   SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
 
   if (pInformation->ControlState == STALLED)
@@ -983,7 +1002,7 @@ uint8_t Post0_Process(void)
 /*******************************************************************************
 * Function Name  : SetDeviceAddress.
 * Description    : Set the device and all the used Endpoints addresses.
-* Input          : - Val: device adress.
+* Input          : - Val: device address.
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
@@ -997,7 +1016,7 @@ void SetDeviceAddress(uint8_t Val)
   {
     _SetEPAddress((uint8_t)i, (uint8_t)i);
   } /* for */
-  _SetDADDR(Val | DADDR_EF); /* set device address and enable function */
+  _SetDADDR(Val | DADDR_EF); /* set device address and enable function */ 
 }
 
 /*******************************************************************************
@@ -1011,4 +1030,4 @@ void NOP_Process(void)
 {
 }
 
-/******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
