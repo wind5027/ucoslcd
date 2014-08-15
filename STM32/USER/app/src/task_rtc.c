@@ -49,7 +49,7 @@ void TaskRTCUpdate(void *pdata)
             RTCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR;
             
             OSMboxPost(LCDNumDisBox,RTCDisBuf);         //发送消息邮箱内容是显示年月日
-            OSSemPend(LCDNumDisOverSemp,1,&err);        //等待LCD数字显示完成信号
+            OSSemPend(LCDNumDisOverSemp,0,&err);        //等待LCD数字显示完成信号
 
             RTCDisBuf->Offset                  = 10;
             RTCDisBuf->DisN                    = 8;
@@ -59,7 +59,7 @@ void TaskRTCUpdate(void *pdata)
             RTCDisBuf->DisControl.BackgrdColor = LCD_BACKGROUND_COLOR;
 
             OSMboxPost(LCDNumDisBox,RTCDisBuf);         //发送消息邮箱内容是显示时分秒
-            OSSemPend(LCDNumDisOverSemp,1,&err);        //等待LCD数字显示完成信号
+            OSSemPend(LCDNumDisOverSemp,0,&err);        //等待LCD数字显示完成信号
             
             MEM_Set((Uint8 *)CurrentTime,0,PARTITION_LENGTH);        //内存清零
             err = OSMemPut(MEMPointer,CurrentTime);                  //释放内存            

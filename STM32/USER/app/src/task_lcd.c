@@ -55,7 +55,7 @@ void TaskLCDBrgUpdate(void *pdata)
                 cnt ++;
             }
  
-            OSTimeDlyHMSM(0,0,0,30);          //等待最后一次DMA使用FSMC
+            OSTimeDlyHMSM(0,0,0,50);          //等待最后一次DMA使用FSMC
             OSMutexPost(FSMCMutex);            //释放FSMC互斥信号量
             
             MEM_Set((Uint8 *)BuffAddr[0],0,PARTITION_LENGTH);        //内存清零
@@ -63,7 +63,7 @@ void TaskLCDBrgUpdate(void *pdata)
             err1 = OSMemPut(MEMPointer,BuffAddr[0]);                 //释放内存
             err2 = OSMemPut(MEMPointer,BuffAddr[1]);                 //释放内存
         }
-        OSTimeDlyHMSM(0,0,10,0); 
+        OSTimeDlyHMSM(0,0,10,500); 
     }
 }
 

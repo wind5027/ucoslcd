@@ -56,9 +56,10 @@ void TaskStart(void * pdata)
     pdata = pdata;
     
     MEMPointer        = OSMemCreate(MEMPartition,PARTITION_NUM,PARTITION_LENGTH,&err); //创建内存分区
-    FSMCMutex         = OSMutexCreate(2,&err);   //创建FSMC互斥型信号量
-    DMAC4OverSemp     = OSSemCreate(0);          //创建DMA通道4传输完成信号量 
+    FSMCMutex         = OSMutexCreate(3,&err);   //创建FSMC互斥型信号量
     LCDNumDisOverSemp = OSSemCreate(0);          //创建LCD数字显示完成信号量
+    DMAC4OverSemp     = OSSemCreate(1);          //创建DMA通道4传输完成信号量 
+
     LCDNumDisBox      = OSMboxCreate((void *)0); //LCD数字显示消息邮箱
 
 
