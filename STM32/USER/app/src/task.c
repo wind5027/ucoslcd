@@ -23,7 +23,8 @@
 /***************************************************
 任务代码
 ****************************************************/
-#include "task_rtc.c"#include "task_lcd.c"
+#include "task_rtc.c"
+#include "task_lcd.c"
 #include "task_adc.c"
 //#include "task_key.c"
 
@@ -41,7 +42,8 @@ OS_STK  TASK_START_STK[START_STK_SIZE];                  //开始任务堆栈
 ****************************************************/
 OS_STK  TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE];            //RTC更新任务堆栈
 OS_STK  TASK_LCD_BKRG_UPDATE_STK[LCD_STK_SIZE];           //LCD背景更新任务堆栈
-OS_STK  TASK_NUM_DIS_STK[LCD_STK_SIZE];                   //LCD数字显示任务堆栈OS_STK  TASK_GET_VOLT_STK[GET_VOLT_STK_SIZE];             //ADC电压获取任务堆栈
+OS_STK  TASK_NUM_DIS_STK[LCD_STK_SIZE];                   //LCD数字显示任务堆栈
+OS_STK  TASK_GET_VOLT_STK[GET_VOLT_STK_SIZE];             //ADC电压获取任务堆栈
 
 
 
@@ -72,15 +74,16 @@ void TaskStart(void * pdata)
     OSTaskCreate(TaskGetADCVolt, (void * )0,                          //创建ADC 电压值获取任务 
                  (OS_STK *)&TASK_GET_VOLT_STK[GET_VOLT_STK_SIZE-1], 
                  GET_VOLT_TASK_PRIO);
-//    OSTaskCreate(TaskRTCUpdate, (void * )0,                           //创建RTC更新任务 
-//                 (OS_STK *)&TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE-1], 
-//                 RTC_TASK_PRIO);
+    OSTaskCreate(TaskRTCUpdate, (void * )0,                           //创建RTC更新任务 
+                 (OS_STK *)&TASK_RTC_DIS_UPDATE_STK[RTC_STK_SIZE-1], 
+                 RTC_TASK_PRIO);
                  
     OS_EXIT_CRITICAL();                     //退出临界区
     
     OSTaskDel(OS_PRIO_SELF);                //开始任务完成，删除自身。
 }
-
+
+
 
 
 

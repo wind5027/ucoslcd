@@ -207,7 +207,7 @@ void OSTCBInitHook (OS_TCB *ptcb)
 */
 void OSTimeTickHook (void)
 {
-    IWDG_ReloadCounter();//调用看门狗喂狗
+    
 }
 
 
